@@ -1,0 +1,140 @@
+Collections MongoDB pour MediMeet
+Users
+
+_id (ObjectId)
+name (String)
+email (String, unique)
+password (String, hashed)
+role (String, enum: ['patient', 'doctor'])
+phone (String)
+emailVerified (Boolean)
+phoneVerified (Boolean)
+resetPasswordToken (String)
+resetPasswordExpires (Date)
+createdAt (Date)
+updatedAt (Date)
+Patients
+
+_id (ObjectId, reference to Users)
+personalInfo (Object)
+dateOfBirth (Date)
+gender (String)
+address (String)
+medicalHistory (Array of Objects)
+condition (String)
+diagnosisDate (Date)
+notes (String)
+createdAt (Date)
+updatedAt (Date)
+Doctors
+
+_id (ObjectId, reference to Users)
+specialty (String)
+experience (Number)
+availability (Array of Objects)
+day (String)
+startTime (String)
+endTime (String)
+location (String)
+createdAt (Date)
+updatedAt (Date)
+Appointments
+
+_id (ObjectId)
+patientId (ObjectId, reference to Patients)
+doctorId (ObjectId, reference to Doctors)
+appointmentDate (Date)
+status (String, enum: ['confirmed', 'canceled', 'completed'])
+notes (String)
+createdAt (Date)
+updatedAt (Date)
+Notifications
+
+_id (ObjectId)
+userId (ObjectId, reference to Users)
+type (String, enum: ['appointmentConfirmation', 'appointmentReminder', 'appointmentCancellation'])
+message (String)
+sentAt (Date)
+read (Boolean)
+createdAt (Date)
+updatedAt (Date)
+Messages
+
+_id (ObjectId)
+senderId (ObjectId, reference to Users)
+receiverId (ObjectId, reference to Users)
+content (String)
+timestamp (Date)
+read (Boolean)
+createdAt (Date)
+updatedAt (Date)
+Teleconsultations
+
+_id (ObjectId)
+appointmentId (ObjectId, reference to Appointments)
+videoLink (String)
+documents (Array of Strings, file paths or URLs)
+prescription (String)
+createdAt (Date)
+updatedAt (Date)
+Payments
+
+_id (ObjectId)
+userId (ObjectId, reference to Users)
+appointmentId (ObjectId, reference to Appointments)
+amount (Number)
+paymentMethod (String, enum: ['creditCard', 'PayPal'])
+transactionId (String)
+status (String, enum: ['pending', 'completed', 'failed'])
+createdAt (Date)
+updatedAt (Date)
+Reviews
+
+_id (ObjectId)
+doctorId (ObjectId, reference to Doctors)
+patientId (ObjectId, reference to Patients)
+rating (Number)
+comment (String)
+createdAt (Date)
+updatedAt (Date)
+MedicalRecords
+
+_id (ObjectId)
+patientId (ObjectId, reference to Patients)
+doctorId (ObjectId, reference to Doctors)
+records (Array of Objects)
+date (Date)
+description (String)
+attachments (Array of Strings, file paths or URLs)
+createdAt (Date)
+updatedAt (Date)
+Resources
+
+_id (ObjectId)
+doctorId (ObjectId, reference to Doctors)
+type (String, enum: ['consultationRoom', 'equipment'])
+available (Boolean)
+createdAt (Date)
+updatedAt (Date)
+Reports
+
+_id (ObjectId)
+doctorId (ObjectId, reference to Doctors)
+type (String, enum: ['consultationStatistics', 'patientSatisfaction', 'attendance'])
+data (Object)
+generatedAt (Date)
+createdAt (Date)
+updatedAt (Date)
+Description des Champs
+Users : Gère les informations de base des utilisateurs (patients et médecins).
+Patients : Stocke des informations spécifiques aux patients, y compris les antécédents médicaux.
+Doctors : Contient des informations spécifiques aux médecins, telles que la spécialité et les horaires de disponibilité.
+Appointments : Gère les informations de prise de rendez-vous.
+Notifications : Stocke les notifications envoyées aux utilisateurs.
+Messages : Gère les messages échangés entre les patients et les médecins.
+Teleconsultations : Contient les informations liées aux consultations vidéo.
+Payments : Gère les informations de paiement pour les consultations.
+Reviews : Stocke les avis et évaluations des médecins par les patients.
+MedicalRecords : Gère les dossiers médicaux des patients.
+Resources : Gère les ressources disponibles pour les consultations.
+Reports : Contient les rapports et analyses statistiques.
