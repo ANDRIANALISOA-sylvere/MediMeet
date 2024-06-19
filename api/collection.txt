@@ -1,4 +1,5 @@
 Collections MongoDB pour MediMeet
+
 Users
 
 _id (ObjectId)
@@ -13,6 +14,7 @@ resetPasswordToken (String)
 resetPasswordExpires (Date)
 createdAt (Date)
 updatedAt (Date)
+
 Patients
 
 _id (ObjectId, reference to Users)
@@ -26,6 +28,7 @@ diagnosisDate (Date)
 notes (String)
 createdAt (Date)
 updatedAt (Date)
+
 Doctors
 
 _id (ObjectId, reference to Users)
@@ -38,6 +41,7 @@ endTime (String)
 location (String)
 createdAt (Date)
 updatedAt (Date)
+
 Appointments
 
 _id (ObjectId)
@@ -48,6 +52,7 @@ status (String, enum: ['confirmed', 'canceled', 'completed'])
 notes (String)
 createdAt (Date)
 updatedAt (Date)
+
 Notifications
 
 _id (ObjectId)
@@ -58,6 +63,7 @@ sentAt (Date)
 read (Boolean)
 createdAt (Date)
 updatedAt (Date)
+
 Messages
 
 _id (ObjectId)
@@ -68,6 +74,7 @@ timestamp (Date)
 read (Boolean)
 createdAt (Date)
 updatedAt (Date)
+
 Teleconsultations
 
 _id (ObjectId)
@@ -77,6 +84,7 @@ documents (Array of Strings, file paths or URLs)
 prescription (String)
 createdAt (Date)
 updatedAt (Date)
+
 Payments
 
 _id (ObjectId)
@@ -88,6 +96,7 @@ transactionId (String)
 status (String, enum: ['pending', 'completed', 'failed'])
 createdAt (Date)
 updatedAt (Date)
+
 Reviews
 
 _id (ObjectId)
@@ -97,6 +106,7 @@ rating (Number)
 comment (String)
 createdAt (Date)
 updatedAt (Date)
+
 MedicalRecords
 
 _id (ObjectId)
@@ -108,6 +118,7 @@ description (String)
 attachments (Array of Strings, file paths or URLs)
 createdAt (Date)
 updatedAt (Date)
+
 Resources
 
 _id (ObjectId)
@@ -116,6 +127,7 @@ type (String, enum: ['consultationRoom', 'equipment'])
 available (Boolean)
 createdAt (Date)
 updatedAt (Date)
+
 Reports
 
 _id (ObjectId)
@@ -125,16 +137,3 @@ data (Object)
 generatedAt (Date)
 createdAt (Date)
 updatedAt (Date)
-Description des Champs
-Users : Gère les informations de base des utilisateurs (patients et médecins).
-Patients : Stocke des informations spécifiques aux patients, y compris les antécédents médicaux.
-Doctors : Contient des informations spécifiques aux médecins, telles que la spécialité et les horaires de disponibilité.
-Appointments : Gère les informations de prise de rendez-vous.
-Notifications : Stocke les notifications envoyées aux utilisateurs.
-Messages : Gère les messages échangés entre les patients et les médecins.
-Teleconsultations : Contient les informations liées aux consultations vidéo.
-Payments : Gère les informations de paiement pour les consultations.
-Reviews : Stocke les avis et évaluations des médecins par les patients.
-MedicalRecords : Gère les dossiers médicaux des patients.
-Resources : Gère les ressources disponibles pour les consultations.
-Reports : Contient les rapports et analyses statistiques.

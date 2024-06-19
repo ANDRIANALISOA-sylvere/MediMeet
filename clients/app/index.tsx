@@ -1,15 +1,40 @@
-import { Text, View } from "react-native";
+import React from "react";
+import {
+  Input,
+  ApplicationProvider,
+  Text,
+  Button,
+  Layout,
+  IconRegistry,
+  Icon,
+} from "@ui-kitten/components";
+import * as eva from "@eva-design/eva";
+import { StyleSheet } from "react-native";
+import { EvaIconsPack } from "@ui-kitten/eva-icons";
 
-export default function Index() {
+const App = (): React.ReactElement => {
+  const [value, setValue] = React.useState("");
+
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <>
+      <IconRegistry icons={EvaIconsPack} />
+      <ApplicationProvider {...eva} theme={eva.light}>
+        <Layout style={{ padding: 5 }}>
+          
+        </Layout>
+      </ApplicationProvider>
+    </>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  button: {
+    margin: 2,
+  },
+});
+
+export default App;
