@@ -23,4 +23,4 @@ const doctorSchema = new Schema(
   }
 );
 
-module.export = mongoose.model("Doctor", doctorSchema);
+module.exports = mongoose.model("Doctor", doctorSchema);

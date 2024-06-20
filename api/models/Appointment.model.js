@@ -18,4 +18,4 @@ const appointementSchema = new Schema(
   }
 );
 
-module.export = mongoose.model("Appointement", appointementSchema);
+module.exports = mongoose.model("Appointement", appointementSchema);

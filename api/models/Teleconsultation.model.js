@@ -17,4 +17,4 @@ const teleconsultationSchema = new Schema(
   }
 );
 
-module.export = mongoose.model("Teleconsultation", teleconsultationSchema);
+module.exports = mongoose.model("Teleconsultation", teleconsultationSchema);
