@@ -86,7 +86,26 @@ const Login = async (req, res) => {
   }
 };
 
+const GoogleAuth = async (req, res) => {
+  const payload = {
+    user: {
+      id: req.user.id,
+    },
+  };
+
+  jwt.sign(
+    payload,
+    process.env.JWT_SECRET,
+    { expiresIn: 360000 },
+    (err, token) => {
+      if (err) throw err;
+      res.redirect(`/?token=${token}`);
+    }
+  );
+};
+
 module.exports = {
   Register,
-  Login
+  Login,
+  GoogleAuth
 };
