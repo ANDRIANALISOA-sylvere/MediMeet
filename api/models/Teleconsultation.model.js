@@ -9,6 +9,7 @@ const teleconsultationSchema = new Schema(
       required: "true",
     },
     videoLink: { type: String, required: true },
+    documents: { type: [String] },
     prescription: { type: String, required: true },
   },
   {

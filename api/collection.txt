@@ -10,8 +10,8 @@ role (String, enum: ['patient', 'doctor'])
 phone (String)
 emailVerified (Boolean)
 phoneVerified (Boolean)
-resetPasswordToken (String)
-resetPasswordExpires (Date)
+resetPasswordToken (String) ----> Jeton pour la réinitialisation du mot de passe.
+resetPasswordExpires (Date) -----> Date d'expiration du jeton de réinitialisation du mot de passe.
 createdAt (Date)
 updatedAt (Date)
 
@@ -23,33 +23,33 @@ dateOfBirth (Date)
 gender (String)
 address (String)
 medicalHistory (Array of Objects)
-condition (String)
-diagnosisDate (Date)
-notes (String)
+condition (String) ---> Condition médicale actuelle du patient.
+diagnosisDate (Date) --->  Date du diagnostic.
+notes (String) ----> Notes médicales supplémentaires.
 createdAt (Date)
 updatedAt (Date)
 
 Doctors
 
 _id (ObjectId, reference to Users)
-specialty (String)
-experience (Number)
-availability (Array of Objects)
-day (String)
-startTime (String)
-endTime (String)
+specialty (String) ----> Spécialité médicale du médecin.
+experience (Number) ----> Années d'expérience du médecin.
+availability (Array of Objects) ---> Disponibilités du médecin, définies par jour, heure de début et heure de fin.
+day (String) ---> Jour de disponibilité.
+startTime (String) ----> Heure de début de disponibilité.
+endTime (String) ----> Heure de fin de disponibilité.
 location (String)
 createdAt (Date)
 updatedAt (Date)
 
-Appointments
+Appointments ----> Rendez-vous
 
 _id (ObjectId)
 patientId (ObjectId, reference to Patients)
 doctorId (ObjectId, reference to Doctors)
-appointmentDate (Date)
-status (String, enum: ['confirmed', 'canceled', 'completed'])
-notes (String)
+appointmentDate (Date) ----> Date et heure du rendez-vous
+status (String, enum: ['confirmed', 'canceled', 'completed']) ---->  Statut du rendez-vous (par exemple, "confirmé", "annulé", "terminé")
+notes (String) ----> Notes supplémentaires concernant le rendez-vous.
 createdAt (Date)
 updatedAt (Date)
 
@@ -57,9 +57,9 @@ Notifications
 
 _id (ObjectId)
 userId (ObjectId, reference to Users)
-type (String, enum: ['appointmentConfirmation', 'appointmentReminder', 'appointmentCancellation'])
-message (String)
-sentAt (Date)
+type (String, enum: ['appointmentConfirmation', 'appointmentReminder', 'appointmentCancellation']) ---> Type de notification ['confirmationRendezVous', 'rappelRendezVous', 'annulationRendezVous']
+message (String) ---> Contenu du message de notification.
+sentAt (Date) ----> Date et heure d'envoi de la notification.
 read (Boolean)
 createdAt (Date)
 updatedAt (Date)
@@ -70,7 +70,7 @@ _id (ObjectId)
 senderId (ObjectId, reference to Users)
 receiverId (ObjectId, reference to Users)
 content (String)
-timestamp (Date)
+timestamp (Date) ----> Date et heure d'envoi du message.
 read (Boolean)
 createdAt (Date)
 updatedAt (Date)
@@ -79,9 +79,9 @@ Teleconsultations
 
 _id (ObjectId)
 appointmentId (ObjectId, reference to Appointments)
-videoLink (String)
-documents (Array of Strings, file paths or URLs)
-prescription (String)
+videoLink (String) ----> Lien de la vidéoconférence.
+documents (Array of Strings, file paths or URLs) ----> Documents associés à la téléconsultation.
+prescription (String) ----> Détails de la prescription.
 createdAt (Date)
 updatedAt (Date)
 
@@ -102,38 +102,19 @@ Reviews
 _id (ObjectId)
 doctorId (ObjectId, reference to Doctors)
 patientId (ObjectId, reference to Patients)
-rating (Number)
-comment (String)
+rating (Number) ----> Note attribuée au médecin.
+comment (String) ----> Commentaire du patient.
 createdAt (Date)
 updatedAt (Date)
 
-MedicalRecords
+MedicalRecords ----> Dossiers Médicaux
 
 _id (ObjectId)
 patientId (ObjectId, reference to Patients)
 doctorId (ObjectId, reference to Doctors)
-records (Array of Objects)
-date (Date)
-description (String)
-attachments (Array of Strings, file paths or URLs)
-createdAt (Date)
-updatedAt (Date)
-
-Resources
-
-_id (ObjectId)
-doctorId (ObjectId, reference to Doctors)
-type (String, enum: ['consultationRoom', 'equipment'])
-available (Boolean)
-createdAt (Date)
-updatedAt (Date)
-
-Reports
-
-_id (ObjectId)
-doctorId (ObjectId, reference to Doctors)
-type (String, enum: ['consultationStatistics', 'patientSatisfaction', 'attendance'])
-data (Object)
-generatedAt (Date)
+records (Array of Objects) ----> Enregistrements médicaux, définis par date, description et pièces jointes.
+date (Date) ----> Date de l'enregistrement médical.
+description (String) ---> Description de l'enregistrement médical.
+attachments (Array of Strings, file paths or URLs) ---> Pièces jointes associées à l'enregistrement médical.
 createdAt (Date)
 updatedAt (Date)
