@@ -28,7 +28,7 @@ const AddAppointment = async (req, res) => {
 const CanceleAppointment = async (req, res) => {
   const { id } = req.query;
   try {
-    const appointment = await Appointment.findByIdAndUpdate(id, {
+    let appointment = await Appointment.findByIdAndUpdate(id, {
       status: "canceled",
     });
 
@@ -50,7 +50,7 @@ const CanceleAppointment = async (req, res) => {
 const CompleteAppointment = async (req, res) => {
   const { id } = req.query;
   try {
-    const appointment = await Appointment.findByIdAndUpdate(id, {
+    let appointment = await Appointment.findByIdAndUpdate(id, {
       status: "completed",
     });
 
