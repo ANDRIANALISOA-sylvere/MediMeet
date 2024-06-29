@@ -21,7 +21,7 @@ const AddAppointment = async (req, res) => {
   }
 };
 
-const CanceleAppointmen = async (req, res) => {
+const CanceleAppointment = async (req, res) => {
   const { id } = req.query;
   try {
     const appointment = await Appointment.findByIdAndUpdate(id, {
@@ -41,4 +41,5 @@ const CanceleAppointmen = async (req, res) => {
 
 module.exports = {
   AddAppointment,
+  CanceleAppointment
 };
