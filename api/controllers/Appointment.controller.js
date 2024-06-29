@@ -29,7 +29,25 @@ const CanceleAppointment = async (req, res) => {
     });
 
     if (!appointment) {
-      return res.status(400).json("Error when updating an appointment");
+      return res.status(400).json("Appointment not found or error occurred");
+    }
+
+    res.status(200).json({ appointment });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Error when updating an appointment");
+  }
+};
+
+const CompleteAppointment = async (req, res) => {
+  const { id } = req.query;
+  try {
+    const appointment = await Appointment.findByIdAndUpdate(id, {
+      status: "completed",
+    });
+
+    if (!appointment) {
+      return res.status(400).json("Appointment not found or error occurred");
     }
 
     res.status(200).json({ appointment });
@@ -41,5 +59,6 @@ const CanceleAppointment = async (req, res) => {
 
 module.exports = {
   AddAppointment,
-  CanceleAppointment
+  CanceleAppointment,
+  CompleteAppointment
 };

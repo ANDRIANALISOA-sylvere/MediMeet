@@ -10,6 +10,7 @@ const appointementSchema = new Schema(
       type: String,
       enum: ["confirmed", "canceled", "completed"],
       required: true,
+      default: "confirmed",
     },
     notes: { type: String, required: true },
   },
