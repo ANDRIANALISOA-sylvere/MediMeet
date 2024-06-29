@@ -9,6 +9,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const AppointmentRouter = require("./routes/Appointment.route");
 const DoctorRouter = require("./routes/Doctor.route");
+const PatientRouter = require("./routes/Patient.route");
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ connectDB();
 app.use("/api", userRoute);
 app.use("/api", AppointmentRouter);
 app.use("/api", DoctorRouter);
+app.use("/api", PatientRouter);
 
 app.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);
