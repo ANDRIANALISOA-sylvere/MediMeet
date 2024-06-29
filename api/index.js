@@ -1,22 +1,25 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const bodyparser = require("body-parser");
-const session = require('express-session');
+const session = require("express-session");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoute = require("./routes/User.route");
 const passport = require("passport");
-const LocalStrategy = require('passport-local').Strategy;
+const LocalStrategy = require("passport-local").Strategy;
+const AppointmentRouter = require("./routes/Appointment.route");
 
 dotenv.config();
 
 const app = express();
 
-app.use(session({
-  secret: 'secret',
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+  session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
 
 app.use(cors());
 app.use(bodyparser.json());
@@ -30,8 +33,8 @@ const PORT = process.env.PORT || 8800;
 
 connectDB();
 
-
-app.use("/auth", userRoute);
+app.use("/api", userRoute);
+app.use("/api", AppointmentRouter);
 
 app.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);
