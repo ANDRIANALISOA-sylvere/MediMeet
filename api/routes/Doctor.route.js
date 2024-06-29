@@ -13,7 +13,6 @@ router.post("/doctor", addDoctor);
 router.get("/doctors", getDoctors);
 router.get("/doctor/:id", getDoctorById);
 router.put("/doctor/:id", updateDoctor);
-router.delete("/doctor/:id", deleteDoctor);
 router.get("/doctor/:id/availability", getDoctorAvailability);
 router.post("/doctor/:id/availability", addDoctorAvailability);
 
