@@ -3,7 +3,7 @@ const Appointment = require("../models/Appointment.model");
 const AddAppointment = async (req, res) => {
   const { patientId, doctorId, appointmentDate, notes } = req.body;
   try {
-    const appointment = await Appointment.create({
+    let appointment = await Appointment.create({
       patientId,
       doctorId,
       appointmentDate,
@@ -13,6 +13,10 @@ const AddAppointment = async (req, res) => {
     if (!appointment) {
       return res.status(400).json("Error when creaint an appointment");
     }
+
+    appointment = await Appointment.findById(appointment._id)
+      .populate("patientId")
+      .populate("doctorId");
 
     res.status(201).json({ appointment });
   } catch (error) {
@@ -32,6 +36,10 @@ const CanceleAppointment = async (req, res) => {
       return res.status(400).json("Appointment not found or error occurred");
     }
 
+    appointment = await Appointment.findById(appointment._id)
+      .populate("patientId")
+      .populate("doctorId");
+
     res.status(200).json({ appointment });
   } catch (error) {
     console.log(error);
@@ -50,6 +58,10 @@ const CompleteAppointment = async (req, res) => {
       return res.status(400).json("Appointment not found or error occurred");
     }
 
+    appointment = await Appointment.findById(appointment._id)
+      .populate("patientId")
+      .populate("doctorId");
+
     res.status(200).json({ appointment });
   } catch (error) {
     console.log(error);
@@ -60,5 +72,5 @@ const CompleteAppointment = async (req, res) => {
 module.exports = {
   AddAppointment,
   CanceleAppointment,
-  CompleteAppointment
+  CompleteAppointment,
 };

@@ -3,8 +3,8 @@ const { Schema } = mongoose;
 
 const appointementSchema = new Schema(
   {
-    patientId: { type: Schema.Types.ObjectId, ref: "Patient", required: true },
-    doctorId: { type: Schema.Types.ObjectId, ref: "Doctor", required: true },
+    patientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    doctorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     appointmentDate: { type: Date, required: true },
     status: {
       type: String,
