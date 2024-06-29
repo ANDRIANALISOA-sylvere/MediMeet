@@ -6,10 +6,17 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const userRoute = require("./routes/User.route");
 const passport = require("passport");
+const LocalStrategy = require('passport-local').Strategy;
 
 dotenv.config();
 
 const app = express();
+
+app.use(session({
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: false,
+}));
 
 app.use(cors());
 app.use(bodyparser.json());
@@ -22,6 +29,7 @@ require("./config/passport");
 const PORT = process.env.PORT || 8800;
 
 connectDB();
+
 
 app.use("/auth", userRoute);
 
