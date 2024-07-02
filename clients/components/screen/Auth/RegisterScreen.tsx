@@ -68,6 +68,11 @@ function RegisterScreen({ navigation }: any) {
 
       navigation.navigate("MainNavigation");
 
+      setName("");
+      setEmail("");
+      setPassword("");
+      setPhone("");
+
     } catch (error) {
       console.error("Registration error:", error);
       Alert.alert('Login Failed', 'Invalid email or password');
