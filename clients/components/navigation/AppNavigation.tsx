@@ -23,11 +23,11 @@ const AppNavigation = () => {
                 />
                 <Stack.Screen
                     name="Register"
-                    component={LoginScreen}
+                    component={RegisterScreen}
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                    name="Home"
+                    name="MainNavigation"
                     component={MainNavigation}
                     options={{ headerShown: false }}
                 />

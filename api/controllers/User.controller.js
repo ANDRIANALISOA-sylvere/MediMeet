@@ -38,7 +38,7 @@ const Register = async (req, res) => {
       (err, token) => {
         if (token) {
           if (err) throw err;
-          res.json({ token,user });
+          res.json({ token, user });
         }
       }
     );
@@ -50,6 +50,7 @@ const Register = async (req, res) => {
 
 const Login = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
 
   try {
     let user = await User.findOne({ email });
@@ -77,7 +78,7 @@ const Login = async (req, res) => {
       },
       (err, token) => {
         if (err) throw err;
-        res.json({ token,user });
+        res.json({ token, user });
       }
     );
   } catch (error) {
@@ -107,5 +108,5 @@ const GoogleAuth = async (req, res) => {
 module.exports = {
   Register,
   Login,
-  GoogleAuth
+  GoogleAuth,
 };

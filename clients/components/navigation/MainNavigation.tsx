@@ -63,7 +63,7 @@ function MainNavigation() {
                 styles.ctaButton,
                 {
                   backgroundColor: focused ? "#00BFA6" : "white",
-                  borderColor: focused ? "#00BFA6" : "",
+                  borderColor: focused ? "#00BFA6" : "rgba(224, 224, 224, 0)",
                   borderWidth: 1,
                 },
               ]}

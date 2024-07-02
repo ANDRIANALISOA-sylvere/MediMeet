@@ -4,7 +4,7 @@ import { Input, Button, Radio, RadioGroup, Icon } from "@ui-kitten/components";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 
-function RegisterScreen() {
+function RegisterScreen({ navigation }: any) {
   const [loaded, error] = useFonts({
     Poppins: require("../../../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../../../assets/fonts/Poppins-Bold.ttf"),
@@ -100,7 +100,7 @@ function RegisterScreen() {
       </Button>
       <Text style={styles.signupPrompt}>
         Vous avez déjà un compte ?{" "}
-        <Text style={styles.signupLink}>Connectez-vous</Text>
+        <Text style={styles.signupLink} onPress={()=>navigation.navigate("Login")}>Connectez-vous</Text>
       </Text>
     </View>
   );

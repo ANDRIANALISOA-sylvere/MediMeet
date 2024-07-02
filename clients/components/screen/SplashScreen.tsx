@@ -1,20 +1,33 @@
 import React, { useEffect } from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { useFonts } from "expo-font";
+import { View, Text, Image, StyleSheet, ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScree from "expo-splash-screen";
+import { useFonts } from "expo-font";
 
-function SplashScreen() {
+function SplashScreen({ navigation }: any) {
   const [loaded, error] = useFonts({
-    "Poppins": require("../../assets/fonts/Poppins-Regular.ttf"),
+    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
   });
 
   useEffect(() => {
-    if (loaded || error) {
-      SplashScree.hideAsync();
-    }
-  }, [loaded, error]);
+    const checkToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        setTimeout(() => {
+          navigation.navigate('MainNavigation');
+        }, 4000);
+      } else {
+        setTimeout(() => {
+          navigation.navigate('Login');
+        }, 4000);
+      }
+    };
 
-  if (!loaded && !error) {
+    SplashScree.preventAutoHideAsync().catch(() => { });
+    checkToken();
+  }, []);
+
+  if (!loaded || error) {
     return null;
   }
 
@@ -24,6 +37,7 @@ function SplashScreen() {
         <Text style={styles.welcomeText}>Bienvenue sur</Text>
         <Text style={styles.welcomeText}>MediMeet</Text>
       </View>
+      <ActivityIndicator size="large" color="#fff" style={{ marginTop: 20 }} />
       <Image
         source={require("../../assets/images/doctor.png")}
         style={styles.image}
