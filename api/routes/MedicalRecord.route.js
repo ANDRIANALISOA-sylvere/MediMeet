@@ -5,7 +5,7 @@ const {
   getMedicalRecordById,
   updateMedicalRecord,
   deleteMedicalRecord,
-} = require("../controllers/MedicalRecord.controller");
+} = require("../controllers/MedicalRecord.model");
 const router = express.Router();
 
 router.post("/medicalrecord", addMedicalRecord);
