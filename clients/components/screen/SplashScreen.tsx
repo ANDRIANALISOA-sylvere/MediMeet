@@ -5,7 +5,7 @@ import * as SplashScree from "expo-splash-screen";
 
 function SplashScreen() {
   const [loaded, error] = useFonts({
-    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins": require("../../assets/fonts/Poppins-Regular.ttf"),
   });
 
   useEffect(() => {
