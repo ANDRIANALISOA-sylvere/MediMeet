@@ -11,6 +11,7 @@ import {
 import * as eva from "@eva-design/eva";
 import { StyleSheet } from "react-native";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
+import SplashScreen from "@/components/screen/SplashScreen";
 
 const App = (): React.ReactElement => {
   const [value, setValue] = React.useState("");
@@ -19,9 +20,7 @@ const App = (): React.ReactElement => {
     <>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider {...eva} theme={eva.light}>
-        <Layout style={{ padding: 5 }}>
-          
-        </Layout>
+        <SplashScreen></SplashScreen>
       </ApplicationProvider>
     </>
   );
