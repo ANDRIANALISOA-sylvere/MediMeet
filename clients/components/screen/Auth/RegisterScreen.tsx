@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, Alert } from "react-native";
 import { Input, Button, Radio, RadioGroup, Icon } from "@ui-kitten/components";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import axios from "../../../api/axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function RegisterScreen({ navigation }: any) {
   const [loaded, error] = useFonts({
@@ -16,6 +18,11 @@ function RegisterScreen({ navigation }: any) {
   const [isPhoneFocused, setPhoneFocused] = useState(false);
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const [selectedRoleIndex, setSelectedRoleIndex] = useState<number>(0);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     if (loaded || error) {
@@ -42,10 +49,35 @@ function RegisterScreen({ navigation }: any) {
 
   const roles = ["Patient", "Docteur"];
 
+  const handleRegister = async () => {
+    try {
+      const role = roles[selectedRoleIndex];
+      const response = await axios.post("/register", {
+        name: name,
+        email: email,
+        password: password,
+        phone: phone,
+        role: role,
+      });
+
+      const data = await response.data;
+      const { token, user } = data;
+
+      await AsyncStorage.setItem('token', token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      navigation.navigate("MainNavigation");
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      Alert.alert('Login Failed', 'Invalid email or password');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Créer un compte</Text>
-      <Text style={{ marginBottom: 10,fontFamily:'Poppins' }}>
+      <Text style={{ marginBottom: 10, fontFamily: 'Poppins' }}>
         Remplissez les informations ci-dessous
       </Text>
       <Image
@@ -55,6 +87,8 @@ function RegisterScreen({ navigation }: any) {
       <Input
         style={[styles.input, isNameFocused && styles.inputFocus]}
         placeholder="Nom"
+        value={name}
+        onChangeText={setName}
         textStyle={styles.inputText}
         onFocus={() => setNameFocused(true)}
         onBlur={() => setNameFocused(false)}
@@ -62,6 +96,8 @@ function RegisterScreen({ navigation }: any) {
       <Input
         style={[styles.input, isEmailFocused && styles.inputFocus]}
         placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
         textStyle={styles.inputText}
         keyboardType="email-address"
         onFocus={() => setEmailFocused(true)}
@@ -70,6 +106,8 @@ function RegisterScreen({ navigation }: any) {
       <Input
         style={[styles.input, isPasswordFocused && styles.inputFocus]}
         placeholder="Mot de passe"
+        value={password}
+        onChangeText={setPassword}
         textStyle={styles.inputText}
         secureTextEntry={secureTextEntry}
         accessoryRight={renderPasswordIcon}
@@ -79,6 +117,8 @@ function RegisterScreen({ navigation }: any) {
       <Input
         style={[styles.input, isPhoneFocused && styles.inputFocus]}
         placeholder="Numéro de téléphone"
+        value={phone}
+        onChangeText={setPhone}
         textStyle={styles.inputText}
         keyboardType="phone-pad"
         onFocus={() => setPhoneFocused(true)}
@@ -91,16 +131,16 @@ function RegisterScreen({ navigation }: any) {
       >
         {roles.map((role, index) => (
           <Radio key={index} status="success">
-            <Text>{role}</Text>
+            {role}
           </Radio>
         ))}
       </RadioGroup>
-      <Button style={styles.loginButton}>
+      <Button style={styles.loginButton} onPress={handleRegister}>
         <Text style={styles.buttonText}>S'inscrire</Text>
       </Button>
       <Text style={styles.signupPrompt}>
         Vous avez déjà un compte ?{" "}
-        <Text style={styles.signupLink} onPress={()=>navigation.navigate("Login")}>Connectez-vous</Text>
+        <Text style={styles.signupLink} onPress={() => navigation.navigate("Login")}>Connectez-vous</Text>
       </Text>
     </View>
   );

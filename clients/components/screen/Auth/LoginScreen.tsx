@@ -41,6 +41,8 @@ function LoginScreen({ navigation }: any) {
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
       navigation.navigate('MainNavigation');
+      setEmail("");
+      setPassword("");
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid email or password');
     }
