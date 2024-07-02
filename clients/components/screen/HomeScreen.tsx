@@ -46,10 +46,11 @@ function HomeScreen() {
           <Button
             style={styles.searchButton}
             appearance="outline"
+            accessoryLeft={(props) => <Icon {...props} name="search" />}
             status="basic"
             size="small"
           >
-            <Text style={styles.buttonText}>chercher ici ...</Text>
+            <Text style={styles.buttonText}>chercher maintenat ...</Text>
           </Button>
         </View>
         <Image
@@ -103,6 +104,7 @@ function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff'
   },
   header: {
     flexDirection: "row",

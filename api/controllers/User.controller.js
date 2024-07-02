@@ -38,7 +38,7 @@ const Register = async (req, res) => {
       (err, token) => {
         if (token) {
           if (err) throw err;
-          res.json({ token });
+          res.json({ token,user });
         }
       }
     );
@@ -77,7 +77,7 @@ const Login = async (req, res) => {
       },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token,user });
       }
     );
   } catch (error) {
