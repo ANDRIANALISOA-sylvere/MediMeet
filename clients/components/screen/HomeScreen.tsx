@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, View, Text, Image } from "react-native";
+import { StyleSheet, View, Text, Image, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Icon, Button } from "@ui-kitten/components";
@@ -69,31 +69,33 @@ function HomeScreen() {
         </View>
       </View>
 
-      <View style={styles.doctorContainer}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image
-            source={require("../../assets/images/docteur.webp")}
-            style={styles.doctorAvatar}
-          />
-          <View style={styles.doctorTextContainer}>
-            <Text style={styles.doctorName}>Sandra</Text>
-            <Text style={styles.doctorSpecialty}>Dentiste</Text>
-            <View style={styles.ratingContainer}>
-              <Icon name="star" style={styles.starIcon} fill="#FFD700" />
-              <Text style={styles.ratingText}>4 (2000)</Text>
+      <ScrollView style={styles.doctorList}>
+        <View style={styles.doctorContainer}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image
+              source={require("../../assets/images/docteur.webp")}
+              style={styles.doctorAvatar}
+            />
+            <View style={styles.doctorTextContainer}>
+              <Text style={styles.doctorName}>Sandra</Text>
+              <Text style={styles.doctorSpecialty}>Dentiste</Text>
+              <View style={styles.ratingContainer}>
+                <Icon name="star" style={styles.starIcon} fill="#FFD700" />
+                <Text style={styles.ratingText}>4 (2000)</Text>
+              </View>
             </View>
           </View>
-        </View>
-        <View style={styles.rightColumn}>
-          <View style={styles.feesContainer}>
-            <Text style={styles.feesLabel}>Frais</Text>
-            <Text style={styles.feesValue}>Ar 5000</Text>
+          <View style={styles.rightColumn}>
+            <View style={styles.feesContainer}>
+              <Text style={styles.feesLabel}>Frais</Text>
+              <Text style={styles.feesValue}>Ar 5000</Text>
+            </View>
+            <Button style={styles.appointmentButton} size="small">
+              <Text style={styles.buttonText}>Rendez-vous</Text>
+            </Button>
           </View>
-          <Button style={styles.appointmentButton} size="small">
-            <Text style={styles.buttonText}>Rendez-vous</Text>
-          </Button>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -172,6 +174,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 10,
+  },
+  doctorList: {
+    flex: 1,
   },
   doctorContainer: {
     flexDirection: "row",
