@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from "@ui-kitten/components";
 import { View, StyleSheet } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 
 const Tab = createBottomTabNavigator();
 
@@ -12,6 +14,20 @@ import PatientsScreen from "../screen/DoctorScreen/Patient";
 import AccountScreen from "../screen/DoctorScreen/Account";
 
 function DoctorNavigation() {
+    const [loaded, error] = useFonts({
+        Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
+        "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
+    });
+
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
+    }
     return (
         <Tab.Navigator
             initialRouteName="Accueil"
@@ -44,7 +60,7 @@ function DoctorNavigation() {
                     headerShown: true,
                     title: "Mes patients",
                     headerTitleStyle: {
-                        fontFamily: "Poppins",
+                        fontFamily: "Poppins-Bold",
                     },
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
@@ -62,6 +78,10 @@ function DoctorNavigation() {
                 options={{
                     tabBarLabel: () => null,
                     headerShown: true,
+                    title: "Rendez-vous",
+                    headerTitleStyle: {
+                        fontFamily: "Poppins-Bold",
+                    },
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={[
@@ -86,8 +106,11 @@ function DoctorNavigation() {
                 name="Messages"
                 component={MessagesScreen}
                 options={{
-                    tabBarLabel: "Messages",
-                    headerShown: false,
+                    tabBarLabel: "Poppins-Bold",
+                    headerShown: true,
+                    headerTitleStyle: {
+                        fontFamily: "Poppins-Bold",
+                    },
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
                             name={focused ? "message-square" : "message-square-outline"}
