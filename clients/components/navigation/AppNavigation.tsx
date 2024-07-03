@@ -4,6 +4,7 @@ import SplashScreen from "../screen/SplashScreen";
 import LoginScreen from "../screen/Auth/LoginScreen";
 import MainNavigation from "./MainNavigation";
 import RegisterScreen from "../screen/Auth/RegisterScreen";
+import DoctorNavigation from "./DoctorNavigation";
 
 const Stack = createStackNavigator();
 
@@ -29,6 +30,11 @@ const AppNavigation = () => {
                 <Stack.Screen
                     name="MainNavigation"
                     component={MainNavigation}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="DoctorNavigation"
+                    component={DoctorNavigation}
                     options={{ headerShown: false }}
                 />
             </Stack.Navigator>
