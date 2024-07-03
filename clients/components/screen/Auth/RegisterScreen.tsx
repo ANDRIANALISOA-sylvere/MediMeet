@@ -66,7 +66,11 @@ function RegisterScreen({ navigation }: any) {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
-      navigation.navigate("MainNavigation");
+      if (user.role === 'Patient') {
+        navigation.navigate('MainNavigation');
+      } else if (user.role === 'Docteur') {
+        navigation.navigate('DoctorNavigation');
+      }
 
       setName("");
       setEmail("");

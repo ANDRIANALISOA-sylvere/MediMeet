@@ -40,13 +40,19 @@ function LoginScreen({ navigation }: any) {
       await AsyncStorage.setItem('token', token);
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
-      navigation.navigate('MainNavigation');
+      if (user.role === 'Patient') {
+        navigation.navigate('MainNavigation');
+      } else if (user.role === 'Docteur') {
+        navigation.navigate('DoctorNavigation');
+      }
+
       setEmail("");
       setPassword("");
     } catch (error) {
       Alert.alert('Login Failed', 'Invalid email or password');
     }
   };
+
 
   const renderEmailIcon = (props: any) => (
     <Icon {...props} name="email-outline" fill="#00BFA6" />
