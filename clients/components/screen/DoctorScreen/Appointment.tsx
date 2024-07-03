@@ -1,10 +1,11 @@
 import React from 'react'
+import { View } from 'react-native'
 
 function Appointment() {
   return (
-    <div>
+    <View>
       
-    </div>
+    </View>
   )
 }
 

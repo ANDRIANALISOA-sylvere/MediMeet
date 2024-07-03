@@ -1,10 +1,11 @@
 import React from 'react'
+import { View } from 'react-native'
 
 function Notification() {
   return (
-    <div>
+    <View>
       
-    </div>
+    </View>
   )
 }
 

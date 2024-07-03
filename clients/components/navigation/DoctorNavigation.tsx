@@ -9,7 +9,6 @@ import HomeScreen from "../screen/DoctorScreen/Home";
 import MessagesScreen from "../screen/DoctorScreen/Message";
 import AppointmentsScreen from "../screen/DoctorScreen/Appointment";
 import PatientsScreen from "../screen/DoctorScreen/Patient";
-import NotificationsScreen from "../screen/DoctorScreen/Notification";
 import AccountScreen from "../screen/DoctorScreen/Account";
 
 function DoctorNavigation() {
@@ -38,14 +37,14 @@ function DoctorNavigation() {
                 }}
             />
             <Tab.Screen
-                name="Messages"
-                component={MessagesScreen}
+                name="Patients"
+                component={PatientsScreen}
                 options={{
-                    tabBarLabel: "Messages",
+                    tabBarLabel: "Patients",
                     headerShown: false,
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
-                            name={focused ? "message-square" : "message-square-outline"}
+                            name={focused ? "people" : "people-outline"}
                             fill={color}
                             style={{ width: size, height: size }}
                         />
@@ -79,34 +78,18 @@ function DoctorNavigation() {
                 }}
             />
             <Tab.Screen
-                name="Patients"
-                component={PatientsScreen}
+                name="Messages"
+                component={MessagesScreen}
                 options={{
-                    tabBarLabel: "Patients",
+                    tabBarLabel: "Messages",
                     headerShown: false,
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
-                            name={focused ? "people" : "people-outline"}
+                            name={focused ? "message-square" : "message-square-outline"}
                             fill={color}
                             style={{ width: size, height: size }}
                         />
                     ),
-                }}
-            />
-            <Tab.Screen
-                name="Notifications"
-                component={NotificationsScreen}
-                options={{
-                    tabBarLabel: "Notifications",
-                    headerShown: false,
-                    tabBarIcon: ({ color, size, focused }) => (
-                        <Icon
-                            name={focused ? "bell" : "bell-outline"}
-                            fill={color}
-                            style={{ width: size, height: size }}
-                        />
-                    ),
-                    tabBarBadge: 3,
                 }}
             />
             <Tab.Screen

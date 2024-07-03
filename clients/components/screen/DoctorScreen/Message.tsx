@@ -1,10 +1,11 @@
 import React from 'react'
+import { View } from 'react-native'
 
 function Message() {
   return (
-    <div>
+    <View>
       
-    </div>
+    </View>
   )
 }
 
