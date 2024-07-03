@@ -41,7 +41,11 @@ function DoctorNavigation() {
                 component={PatientsScreen}
                 options={{
                     tabBarLabel: "Patients",
-                    headerShown: false,
+                    headerShown: true,
+                    title: "Mes patients",
+                    headerTitleStyle: {
+                        fontFamily: "Poppins",
+                    },
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
                             name={focused ? "people" : "people-outline"}
@@ -51,12 +55,13 @@ function DoctorNavigation() {
                     ),
                 }}
             />
+
             <Tab.Screen
                 name="RendezVous"
                 component={AppointmentsScreen}
                 options={{
                     tabBarLabel: () => null,
-                    headerShown: false,
+                    headerShown: true,
                     tabBarIcon: ({ focused }) => (
                         <View
                             style={[

@@ -4,6 +4,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScree from "expo-splash-screen";
 import { useFonts } from "expo-font";
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: "Patient" | "Docteur";
+  phone: string;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 function SplashScreen({ navigation }: any) {
   const [loaded, error] = useFonts({
     Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
@@ -12,9 +25,16 @@ function SplashScreen({ navigation }: any) {
   useEffect(() => {
     const checkToken = async () => {
       const token = await AsyncStorage.getItem('token');
-      if (token) {
+      const userString = await AsyncStorage.getItem("user");
+
+      if (token && userString) {
+        const user: User = JSON.parse(userString);
         setTimeout(() => {
-          navigation.navigate('MainNavigation');
+          if (user.role === 'Patient') {
+            navigation.navigate('MainNavigation');
+          } else if (user.role === 'Docteur') {
+            navigation.navigate('DoctorNavigation');
+          }
         }, 4000);
       } else {
         setTimeout(() => {
