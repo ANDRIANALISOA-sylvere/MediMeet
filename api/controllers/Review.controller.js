@@ -91,10 +91,33 @@ const deleteReview = async (req, res) => {
   }
 };
 
+const getReviewsByDoctor = async (req, res) => {
+  const { doctorId } = req.params;
+
+  try {
+    const reviews = await Review.find({ doctorId })
+      .populate("doctorId", "specialty experience")
+      .populate("patientId", "personalInfo");
+
+    if (!reviews || reviews.length === 0) {
+      return res.status(404).json("No reviews found for this doctor");
+    }
+
+    const averageRating =
+      reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+
+    res.status(200).json({ reviews, averageRating });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Error fetching reviews");
+  }
+};
+
 module.exports = {
   addReview,
   getReviews,
   getReviewById,
   updateReview,
   deleteReview,
+  getReviewsByDoctor,
 };
