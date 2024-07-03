@@ -106,7 +106,7 @@ function DoctorNavigation() {
                 name="Messages"
                 component={MessagesScreen}
                 options={{
-                    tabBarLabel: "Poppins-Bold",
+                    tabBarLabel: "Messages",
                     headerShown: true,
                     headerTitleStyle: {
                         fontFamily: "Poppins-Bold",
@@ -125,7 +125,11 @@ function DoctorNavigation() {
                 component={AccountScreen}
                 options={{
                     tabBarLabel: "Compte",
-                    headerShown: false,
+                    headerShown: true,
+                    title: "Mon compte",
+                    headerTitleStyle: {
+                        fontFamily: "Poppins-Bold",
+                    },
                     tabBarIcon: ({ color, size, focused }) => (
                         <Icon
                             name={focused ? "person" : "person-outline"}
