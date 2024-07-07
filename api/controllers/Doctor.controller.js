@@ -14,7 +14,10 @@ const addDoctor = async (req, res) => {
 
     await doctor.save();
 
-    const populatedDoctor = await Doctor.findById(doctor._id).populate('_id', 'name email role phone');
+    const populatedDoctor = await Doctor.findById(doctor._id).populate(
+      "_id",
+      "name email role phone"
+    );
 
     res.status(201).json({ doctor: populatedDoctor });
   } catch (error) {
@@ -118,41 +121,42 @@ const getPopularDoctors = async (req, res) => {
         $group: {
           _id: "$doctorId",
           averageRating: { $avg: "$rating" },
+          reviewCount: { $sum: 1 },
         },
       },
-      {
-        $sort: { averageRating: -1 },
-      },
-      {
-        $limit: 5,
-      },
+      { $sort: { averageRating: -1, reviewCount: -1 } },
+      { $limit: 5 },
       {
         $lookup: {
           from: "doctors",
           localField: "_id",
           foreignField: "_id",
-          as: "doctor",
+          as: "doctorInfo",
         },
       },
-      {
-        $unwind: "$doctor",
-      },
+      { $unwind: "$doctorInfo" },
       {
         $project: {
-          _id: 0,
-          doctorId: "$_id",
+          _id: "$doctorInfo._id",
+          name: "$doctorInfo.name",
+          specialty: "$doctorInfo.specialty",
+          experience:"$doctorInfo.experience",
           averageRating: 1,
-          specialty: "$doctor.specialty",
-          experience: "$doctor.experience",
-          name: "$doctor.name",
+          reviewCount: 1,
         },
       },
     ]);
 
-    res.status(200).json({ popularDoctors });
+    res.status(200).json({
+      success: true,
+      data: popularDoctors,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json("Error fetching popular doctors");
+    res.status(500).json({
+      success: false,
+      message: "Erreur lors de la récupération des médecins populaires",
+      error: error.message,
+    });
   }
 };
 
@@ -163,4 +167,5 @@ module.exports = {
   updateDoctor,
   getDoctorAvailability,
   addDoctorAvailability,
+  getPopularDoctors,
 };
