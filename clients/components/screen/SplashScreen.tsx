@@ -24,26 +24,26 @@ function SplashScreen({ navigation }: any) {
 
   useEffect(() => {
     const checkToken = async () => {
-      const token = await AsyncStorage.getItem('token');
+      const token = await AsyncStorage.getItem("token");
       const userString = await AsyncStorage.getItem("user");
 
       if (token && userString) {
         const user: User = JSON.parse(userString);
         setTimeout(() => {
-          if (user.role === 'Patient') {
-            navigation.navigate('MainNavigation');
-          } else if (user.role === 'Docteur') {
-            navigation.navigate('DoctorNavigation');
+          if (user.role === "Patient") {
+            navigation.navigate("MainNavigation");
+          } else if (user.role === "Docteur") {
+            navigation.navigate("DoctorNavigation");
           }
         }, 4000);
       } else {
         setTimeout(() => {
-          navigation.navigate('Login');
+          navigation.navigate("Login");
         }, 4000);
       }
     };
 
-    SplashScree.preventAutoHideAsync().catch(() => { });
+    SplashScree.preventAutoHideAsync().catch(() => {});
     checkToken();
   }, []);
 

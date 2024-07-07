@@ -1,4 +1,5 @@
 const Doctor = require("../models/Doctor.model");
+const ReviewModel = require("../models/Review.model");
 
 const addDoctor = async (req, res) => {
   const { _id, specialty, experience, availability } = req.body;
@@ -13,7 +14,9 @@ const addDoctor = async (req, res) => {
 
     await doctor.save();
 
-    res.status(201).json({ doctor });
+    const populatedDoctor = await Doctor.findById(doctor._id).populate('_id', 'name email role phone');
+
+    res.status(201).json({ doctor: populatedDoctor });
   } catch (error) {
     console.error(error);
     res.status(500).json("Error adding doctor");
@@ -105,6 +108,51 @@ const addDoctorAvailability = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json("Error adding doctor availability");
+  }
+};
+
+const getPopularDoctors = async (req, res) => {
+  try {
+    const popularDoctors = await ReviewModel.aggregate([
+      {
+        $group: {
+          _id: "$doctorId",
+          averageRating: { $avg: "$rating" },
+        },
+      },
+      {
+        $sort: { averageRating: -1 },
+      },
+      {
+        $limit: 5,
+      },
+      {
+        $lookup: {
+          from: "doctors",
+          localField: "_id",
+          foreignField: "_id",
+          as: "doctor",
+        },
+      },
+      {
+        $unwind: "$doctor",
+      },
+      {
+        $project: {
+          _id: 0,
+          doctorId: "$_id",
+          averageRating: 1,
+          specialty: "$doctor.specialty",
+          experience: "$doctor.experience",
+          name: "$doctor.name",
+        },
+      },
+    ]);
+
+    res.status(200).json({ popularDoctors });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Error fetching popular doctors");
   }
 };
 
