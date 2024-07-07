@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, Image, ScrollView } from "react-native";
-import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { Icon, Button } from "@ui-kitten/components";
 import axios from "../../api/axios";
 
@@ -15,11 +20,7 @@ interface Doctor {
   reviewCount: number;
 }
 
-function HomeScreen() {
-  const [loaded, error] = useFonts({
-    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
-    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
-  });
+function HomeScreen({ navigation }: any) {
   const [popularDoctors, setPopularDoctors] = useState<Doctor[]>([]);
 
   const fetchPopularDoctors = async () => {
@@ -38,15 +39,9 @@ function HomeScreen() {
     fetchPopularDoctors();
   }, []);
 
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  if (!loaded && !error) {
-    return null;
-  }
+  const handleDoctorPress = (doctor: Doctor) => {
+    navigation.navigate("DoctorDetails", { doctor });
+  };
 
   return (
     <View style={styles.container}>
@@ -101,7 +96,10 @@ function HomeScreen() {
       <ScrollView style={styles.doctorList}>
         {popularDoctors.map((doctor: Doctor) => (
           <View key={doctor._id} style={styles.doctorContainer}>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <TouchableOpacity
+              style={{ flexDirection: "row", alignItems: "center" }}
+              onPress={() => handleDoctorPress(doctor)}
+            >
               <Image
                 source={require("../../assets/images/docteur.webp")}
                 style={styles.doctorAvatar}
@@ -116,13 +114,17 @@ function HomeScreen() {
                   </Text>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
             <View style={styles.rightColumn}>
               <View style={styles.feesContainer}>
                 <Text style={styles.feesLabel}>Frais</Text>
                 <Text style={styles.feesValue}>Ar {doctor.price}</Text>
               </View>
-              <Button style={styles.appointmentButton} size="small">
+              <Button
+                style={styles.appointmentButton}
+                onPress={() => handleDoctorPress(doctor)}
+                size="small"
+              >
                 <Text style={styles.buttonText}>Rendez-vous</Text>
               </Button>
             </View>

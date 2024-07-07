@@ -1,17 +1,53 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 import { Icon } from "@ui-kitten/components";
 import { View, StyleSheet } from "react-native";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 import HomeScreen from "../screen/HomeScreen";
 import AppointmentScreen from "../screen/AppointmentScreen";
 import ChatScreen from "../screen/ChatScreen";
 import NotificationScreen from "../screen/NotificationScreen";
 import AccountScreen from "../screen/AccountScreen";
+import DoctorDetails from "../screen/DoctorDetails";
+
+function HomeStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DoctorDetails"
+        component={DoctorDetails}
+        options={{ title: "Détails du médecin" }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 function MainNavigation() {
+  const [loaded, error] = useFonts({
+    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -23,7 +59,7 @@ function MainNavigation() {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStack}
         options={{
           tabBarLabel: "Accueil",
           headerShown: false,
@@ -69,7 +105,7 @@ function MainNavigation() {
               ]}
             >
               <Icon
-                name={focused ? "calendar" : 'calendar-outline'}
+                name={focused ? "calendar" : "calendar-outline"}
                 fill={focused ? "white" : "#8e8e8e"}
                 style={styles.appointmentIcon}
               />
