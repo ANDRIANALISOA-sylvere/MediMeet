@@ -2,13 +2,14 @@ const Doctor = require("../models/Doctor.model");
 const ReviewModel = require("../models/Review.model");
 
 const addDoctor = async (req, res) => {
-  const { _id, specialty, experience, availability } = req.body;
+  const { _id, specialty, experience, price, availability } = req.body;
 
   try {
     const doctor = new Doctor({
       _id,
       specialty,
       experience,
+      price,
       availability,
     });
 
@@ -136,11 +137,21 @@ const getPopularDoctors = async (req, res) => {
       },
       { $unwind: "$doctorInfo" },
       {
+        $lookup: {
+          from: "users",
+          localField: "doctorInfo._id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
         $project: {
           _id: "$doctorInfo._id",
-          name: "$doctorInfo.name",
+          name: "$userInfo.name",
           specialty: "$doctorInfo.specialty",
-          experience:"$doctorInfo.experience",
+          experience: "$doctorInfo.experience",
+          price: "$doctorInfo.price",
           averageRating: 1,
           reviewCount: 1,
         },

@@ -16,6 +16,7 @@ const doctorSchema = new Schema(
     _id: { type: Schema.Types.ObjectId, ref: "User", required: true },
     specialty: { type: String, required: true },
     experience: { type: Number, required: true },
+    price: { type: Number, required: true },
     availability: [availabilitySchema],
   },
   {

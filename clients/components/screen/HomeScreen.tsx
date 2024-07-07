@@ -1,14 +1,42 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Image, ScrollView } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Icon, Button } from "@ui-kitten/components";
+import axios from "../../api/axios";
+
+interface Doctor {
+  _id: string;
+  name: string;
+  specialty: string;
+  experience: number;
+  price: number;
+  averageRating: number;
+  reviewCount: number;
+}
 
 function HomeScreen() {
   const [loaded, error] = useFonts({
     Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
   });
+  const [popularDoctors, setPopularDoctors] = useState<Doctor[]>([]);
+
+  const fetchPopularDoctors = async () => {
+    try {
+      const response = await axios.get<{ data: Doctor[] }>("/doctor/popular");
+      setPopularDoctors(response.data.data);
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des médecins populaires:",
+        error
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchPopularDoctors();
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {
@@ -71,31 +99,35 @@ function HomeScreen() {
       </View>
 
       <ScrollView style={styles.doctorList}>
-        <View style={styles.doctorContainer}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image
-              source={require("../../assets/images/docteur.webp")}
-              style={styles.doctorAvatar}
-            />
-            <View style={styles.doctorTextContainer}>
-              <Text style={styles.doctorName}>Sandra</Text>
-              <Text style={styles.doctorSpecialty}>Dentiste</Text>
-              <View style={styles.ratingContainer}>
-                <Icon name="star" style={styles.starIcon} fill="#FFD700" />
-                <Text style={styles.ratingText}>4 (2000)</Text>
+        {popularDoctors.map((doctor: Doctor) => (
+          <View key={doctor._id} style={styles.doctorContainer}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Image
+                source={require("../../assets/images/docteur.webp")}
+                style={styles.doctorAvatar}
+              />
+              <View style={styles.doctorTextContainer}>
+                <Text style={styles.doctorName}>{doctor.name}</Text>
+                <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
+                <View style={styles.ratingContainer}>
+                  <Icon name="star" style={styles.starIcon} fill="#FFD700" />
+                  <Text style={styles.ratingText}>
+                    {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={styles.rightColumn}>
-            <View style={styles.feesContainer}>
-              <Text style={styles.feesLabel}>Frais</Text>
-              <Text style={styles.feesValue}>Ar 5000</Text>
+            <View style={styles.rightColumn}>
+              <View style={styles.feesContainer}>
+                <Text style={styles.feesLabel}>Frais</Text>
+                <Text style={styles.feesValue}>Ar {doctor.price}</Text>
+              </View>
+              <Button style={styles.appointmentButton} size="small">
+                <Text style={styles.buttonText}>Rendez-vous</Text>
+              </Button>
             </View>
-            <Button style={styles.appointmentButton} size="small">
-              <Text style={styles.buttonText}>Rendez-vous</Text>
-            </Button>
           </View>
-        </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -104,7 +136,7 @@ function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: "#fff",
   },
   header: {
     flexDirection: "row",
@@ -184,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "rgba(224, 224, 224, 0.3)",
   },
