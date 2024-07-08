@@ -6,7 +6,6 @@ const availabilitySchema = new Schema(
     day: { type: String, required: true },
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
-    location: { type: String, required: true },
   },
   { _id: false }
 );
@@ -18,6 +17,7 @@ const doctorSchema = new Schema(
     experience: { type: Number, required: true },
     price: { type: Number, required: true },
     about: { type: String, required: true },
+    location: { type: String, required: true },
     availability: [availabilitySchema],
   },
   {

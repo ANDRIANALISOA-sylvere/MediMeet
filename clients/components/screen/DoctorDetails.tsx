@@ -9,18 +9,14 @@ function DoctorDetails({ route }: any) {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/docteur.webp')}
+          source={require("../../assets/images/docteur.webp")}
           style={styles.avatar}
         />
         <View style={styles.headerText}>
           <Text style={styles.name}>Dr {doctor.name}</Text>
           <Text style={styles.specialty}>{doctor.specialty}</Text>
           <View style={styles.rating}>
-            <Icon
-              name="star"
-              fill="#FFD700"
-              style={styles.starIcon}
-            />
+            <Icon name="star" fill="#FFD700" style={styles.starIcon} />
             <Text style={styles.ratingText}>
               {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
             </Text>
@@ -40,8 +36,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
   },
   avatar: {
@@ -54,15 +50,16 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 20,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: "Poppins-Bold",
+    textTransform: "capitalize",
   },
   specialty: {
     opacity: 0.3,
     marginTop: 5,
   },
   rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 5,
   },
   starIcon: {
@@ -75,13 +72,13 @@ const styles = StyleSheet.create({
   },
   aboutTitle: {
     fontSize: 18,
-    fontFamily: 'Poppins-Bold',
+    fontFamily: "Poppins-Bold",
     marginBottom: 10,
   },
   about: {
-    textAlign: 'justify',
+    textAlign: "justify",
     opacity: 0.3,
-    fontFamily:'Poppins'
+    fontFamily: "Poppins",
   },
 });
 

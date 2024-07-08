@@ -17,6 +17,12 @@ interface Doctor {
   experience: number;
   price: number;
   about: string;
+  location: string;
+  availability: {
+    day: string;
+    startTime: string;
+    endTime: string;
+  };
   averageRating: number;
   reviewCount: number;
 }
@@ -106,7 +112,7 @@ function HomeScreen({ navigation }: any) {
                 style={styles.doctorAvatar}
               />
               <View style={styles.doctorTextContainer}>
-                <Text style={styles.doctorName}>{doctor.name}</Text>
+                <Text style={styles.doctorName}>Dr. {doctor.name}</Text>
                 <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
                 <View style={styles.ratingContainer}>
                   <Icon name="star" style={styles.starIcon} fill="#FFD700" />
@@ -165,6 +171,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#000",
     fontFamily: "Poppins-Bold",
+    textTransform: "capitalize",
   },
   icon: {
     width: 24,
@@ -234,6 +241,7 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 18,
     fontFamily: "Poppins-Bold",
+    textTransform: "capitalize",
   },
   doctorSpecialty: {
     fontSize: 14,

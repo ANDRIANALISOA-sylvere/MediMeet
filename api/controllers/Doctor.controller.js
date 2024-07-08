@@ -2,7 +2,8 @@ const Doctor = require("../models/Doctor.model");
 const ReviewModel = require("../models/Review.model");
 
 const addDoctor = async (req, res) => {
-  const { _id, specialty, experience, price,about, availability } = req.body;
+  const { _id, specialty, experience, price, about, location, availability } =
+    req.body;
 
   try {
     const doctor = new Doctor({
@@ -11,6 +12,7 @@ const addDoctor = async (req, res) => {
       experience,
       price,
       about,
+      location,
       availability,
     });
 
@@ -154,6 +156,8 @@ const getPopularDoctors = async (req, res) => {
           experience: "$doctorInfo.experience",
           price: "$doctorInfo.price",
           about: "$doctorInfo.about",
+          location:"$doctorInfo.location",
+          availability : "$doctorInfo.availability",
           averageRating: 1,
           reviewCount: 1,
         },
