@@ -17,6 +17,7 @@ const doctorSchema = new Schema(
     specialty: { type: String, required: true },
     experience: { type: Number, required: true },
     price: { type: Number, required: true },
+    about: { type: String, required: true },
     availability: [availabilitySchema],
   },
   {

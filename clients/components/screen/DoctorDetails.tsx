@@ -1,28 +1,34 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
-import { Icon, Button } from "@ui-kitten/components";
+import { Icon } from "@ui-kitten/components";
 
 function DoctorDetails({ route }: any) {
   const { doctor } = route.params;
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", gap: 20 }}>
+      <View style={styles.header}>
         <Image
-          source={require("../../assets/images/docteur.webp")}
-          style={styles.doctorAvatar}
+          source={require('../../assets/images/docteur.webp')}
+          style={styles.avatar}
         />
-        <View>
-          <Text style={styles.name}>{doctor.name}</Text>
+        <View style={styles.headerText}>
+          <Text style={styles.name}>Dr {doctor.name}</Text>
           <Text style={styles.specialty}>{doctor.specialty}</Text>
-          <View style={styles.ratingContainer}>
-            <Icon name="star" style={styles.starIcon} fill="#FFD700" />
-            <Text style={{ fontFamily: "Poppins", opacity: 0.3, fontSize: 15 }}>
-              {doctor.averageRating.toFixed(1)} ({doctor.reviewCount}){" "}
+          <View style={styles.rating}>
+            <Icon
+              name="star"
+              fill="#FFD700"
+              style={styles.starIcon}
+            />
+            <Text style={styles.ratingText}>
+              {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
             </Text>
           </View>
         </View>
       </View>
+      <Text style={styles.aboutTitle}>À propos</Text>
+      <Text style={styles.about}>{doctor.about}</Text>
     </View>
   );
 }
@@ -33,28 +39,49 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
-  doctorAvatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  headerText: {
+    marginLeft: 20,
   },
   name: {
-    fontFamily: "Poppins-Bold",
-    fontSize: 28,
+    fontSize: 20,
+    fontFamily: 'Poppins-Bold',
   },
   specialty: {
-    fontFamily: "Poppins",
     opacity: 0.3,
-    fontSize: 15,
+    marginTop: 5,
+  },
+  rating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 5,
   },
   starIcon: {
-    width: 16,
-    height: 16,
+    width: 20,
+    height: 20,
   },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
+  ratingText: {
+    marginLeft: 5,
+    opacity: 0.3,
+  },
+  aboutTitle: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    marginBottom: 10,
+  },
+  about: {
+    textAlign: 'justify',
+    opacity: 0.3,
+    fontFamily:'Poppins'
   },
 });
 

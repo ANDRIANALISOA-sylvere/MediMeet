@@ -16,6 +16,7 @@ interface Doctor {
   specialty: string;
   experience: number;
   price: number;
+  about: string;
   averageRating: number;
   reviewCount: number;
 }
