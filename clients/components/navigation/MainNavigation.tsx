@@ -24,30 +24,11 @@ function HomeStack() {
         component={HomeScreen}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="DoctorDetails"
-        component={DoctorDetails}
-        options={{ title: "Détails du médecin" }}
-      />
     </Stack.Navigator>
   );
 }
 
-function MainNavigation() {
-  const [loaded, error] = useFonts({
-    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
-    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
-  });
-
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  if (!loaded && !error) {
-    return null;
-  }
+function TabNavigation() {
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -145,6 +126,37 @@ function MainNavigation() {
         }}
       />
     </Tab.Navigator>
+  );
+}
+
+function MainNavigation() {
+  const [loaded, error] = useFonts({
+    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TabNavigation"
+        component={TabNavigation}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DoctorDetails"
+        component={DoctorDetails}
+        options={{ title: "Détails du médecin" }}
+      />
+    </Stack.Navigator>
   );
 }
 
