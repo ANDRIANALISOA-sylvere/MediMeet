@@ -133,11 +133,12 @@ function DoctorDetails({ route }: any) {
       {selectedDate && (
         <>
           <Text style={styles.sectionTitle}>
-            Horaires disponibles pour le{" "}
+            choisir l'heure
+            {/* Horaires disponibles pour le{" "}
             {format(
               parse(selectedDate, "yyyy/MM/dd", new Date()),
               "dd/MM/yyyy"
-            )}
+            )} */}
           </Text>
           <FlatList
             data={availableTimes}
