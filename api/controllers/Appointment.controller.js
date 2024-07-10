@@ -2,11 +2,13 @@ const Appointment = require("../models/Appointment.model");
 
 const AddAppointment = async (req, res) => {
   const { patientId, doctorId, appointmentDate } = req.body;
+  console.log(patientId, doctorId, appointmentDate);
   try {
+    const date = new Date(appointmentDate + "Z");
     let appointment = await Appointment.create({
       patientId,
       doctorId,
-      appointmentDate,
+      appointmentDate: date,
     });
 
     if (!appointment) {

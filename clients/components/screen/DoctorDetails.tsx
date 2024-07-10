@@ -16,6 +16,8 @@ import {
   endOfMonth,
   eachDayOfInterval,
 } from "date-fns";
+import axios from "../../api/axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function DoctorDetails({ route }: any) {
   const { doctor } = route.params;
@@ -70,6 +72,41 @@ function DoctorDetails({ route }: any) {
         .filter((avail: any) => avail.day === selectedDate)
         .map((avail: any) => avail.startTime)
     : [];
+
+  const sendAppointment = async () => {
+    if (!selectedDate || !selectedTime) {
+      console.error("Date ou heure non sélectionnée");
+      return;
+    }
+
+    const userString = await AsyncStorage.getItem("user");
+    if (!userString) {
+      throw new Error("Utilisateur non connecté");
+    }
+
+    const user = JSON.parse(userString);
+    const patientId = user._id;
+
+    if (!patientId) {
+      throw new Error("ID du patient non trouvé");
+    }
+
+    const appointmentDate = `${selectedDate} ${selectedTime}`;
+
+    const appointmentData = {
+      patientId: patientId,
+      doctorId: doctor._id,
+      appointmentDate: appointmentDate,
+    };
+
+    try {
+      const response = await axios.post("/appointment", appointmentData);
+      const result = await response.data;
+      console.log("Rendez-vous envoyé avec succès:", result);
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du rendez-vous:", error);
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -172,9 +209,7 @@ function DoctorDetails({ route }: any) {
         ]}
         appearance={!selectedDate || !selectedTime ? "outline" : "filled"}
         status={!selectedDate || !selectedTime ? "basic" : "primary"}
-        onPress={() =>
-          console.log("Prendre un rendez-vous", selectedDate, selectedTime)
-        }
+        onPress={sendAppointment}
         disabled={!selectedDate || !selectedTime}
       >
         Prendre un rendez-vous
