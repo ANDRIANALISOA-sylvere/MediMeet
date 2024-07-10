@@ -1,17 +1,16 @@
 const Appointment = require("../models/Appointment.model");
 
 const AddAppointment = async (req, res) => {
-  const { patientId, doctorId, appointmentDate, notes } = req.body;
+  const { patientId, doctorId, appointmentDate } = req.body;
   try {
     let appointment = await Appointment.create({
       patientId,
       doctorId,
       appointmentDate,
-      notes,
     });
 
     if (!appointment) {
-      return res.status(400).json("Error when creaint an appointment");
+      return res.status(400).json("Error when creating an appointment");
     }
 
     appointment = await Appointment.findById(appointment._id)

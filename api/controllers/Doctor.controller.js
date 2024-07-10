@@ -99,7 +99,7 @@ const getDoctorAvailability = async (req, res) => {
 
 const addDoctorAvailability = async (req, res) => {
   const { id } = req.params;
-  const { day, startTime, endTime, location } = req.body;
+  const { day, startTime } = req.body;
 
   try {
     const doctor = await Doctor.findById(id);
@@ -108,7 +108,7 @@ const addDoctorAvailability = async (req, res) => {
       return res.status(404).json("Doctor not found");
     }
 
-    doctor.availability.push({ day, startTime, endTime, location });
+    doctor.availability.push({ day, startTime });
     await doctor.save();
 
     res.status(200).json({ availability: doctor.availability });
@@ -156,8 +156,8 @@ const getPopularDoctors = async (req, res) => {
           experience: "$doctorInfo.experience",
           price: "$doctorInfo.price",
           about: "$doctorInfo.about",
-          location:"$doctorInfo.location",
-          availability : "$doctorInfo.availability",
+          location: "$doctorInfo.location",
+          availability: "$doctorInfo.availability",
           averageRating: 1,
           reviewCount: 1,
         },

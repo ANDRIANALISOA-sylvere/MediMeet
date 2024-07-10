@@ -1,21 +1,24 @@
 const Patient = require("../models/Patient.model");
 
 const addPatient = async (req, res) => {
-  const { _id, personalInfo, dateOfBirth, gender, address, medicalHistory } = req.body;
+  const { _id, dateOfBirth, gender, address } = req.body;
 
   try {
     const patient = new Patient({
       _id,
-      personalInfo,
       dateOfBirth,
       gender,
       address,
-      medicalHistory,
     });
 
     await patient.save();
 
-    res.status(201).json({ patient });
+    const populatedPatient = await Patient.findById(patient._id).populate(
+      "_id",
+      "name email role phone"
+    );
+
+    res.status(201).json({ patient : populatedPatient });
   } catch (error) {
     console.error(error);
     res.status(500).json("Error adding patient");
@@ -52,12 +55,12 @@ const getPatientById = async (req, res) => {
 
 const updatePatient = async (req, res) => {
   const { id } = req.params;
-  const { personalInfo, dateOfBirth, gender, address, medicalHistory } = req.body;
+  const { dateOfBirth, gender, address } = req.body;
 
   try {
     const patient = await Patient.findByIdAndUpdate(
       id,
-      { personalInfo, dateOfBirth, gender, address, medicalHistory },
+      { dateOfBirth, gender, address },
       { new: true }
     );
 
@@ -89,43 +92,6 @@ const deletePatient = async (req, res) => {
   }
 };
 
-const addMedicalHistory = async (req, res) => {
-  const { id } = req.params;
-  const { condition, diagnosisDate, notes } = req.body;
-
-  try {
-    const patient = await Patient.findById(id);
-
-    if (!patient) {
-      return res.status(404).json("Patient not found");
-    }
-
-    patient.medicalHistory.push({ condition, diagnosisDate, notes });
-    await patient.save();
-
-    res.status(200).json({ medicalHistory: patient.medicalHistory });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json("Error adding medical history");
-  }
-};
-
-const getMedicalHistory = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const patient = await Patient.findById(id).select('medicalHistory');
-
-    if (!patient) {
-      return res.status(404).json("Patient not found");
-    }
-
-    res.status(200).json({ medicalHistory: patient.medicalHistory });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json("Error fetching medical history");
-  }
-};
 
 module.exports = {
   addPatient,
@@ -133,6 +99,4 @@ module.exports = {
   getPatientById,
   updatePatient,
   deletePatient,
-  addMedicalHistory,
-  getMedicalHistory
 };
