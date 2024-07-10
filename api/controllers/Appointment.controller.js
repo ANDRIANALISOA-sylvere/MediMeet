@@ -71,14 +71,20 @@ const CompleteAppointment = async (req, res) => {
 };
 
 const GetAppointmentByPatient = async (req, res) => {
-  const { patientId } = req.query;
+  const { patientId, status } = req.query;
 
   try {
     if (!patientId) {
       return res.status(400).json({ message: "L'ID du patient est requis" });
     }
 
-    const appointments = await Appointment.find({ patientId })
+    let query = { patientId };
+
+    if (status && status !== "null") {
+      query.status = status;
+    }
+
+    const appointments = await Appointment.find(query)
       .populate({
         path: "doctorId",
         populate: {
@@ -90,9 +96,11 @@ const GetAppointmentByPatient = async (req, res) => {
       .sort({ appointmentDate: 1 });
 
     if (appointments.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "Aucun rendez-vous trouvé pour ce patient" });
+      return res.status(404).json({
+        message: status
+          ? `Aucun rendez-vous avec le statut "${status}" trouvé pour ce patient`
+          : "Aucun rendez-vous trouvé pour ce patient",
+      });
     }
 
     res.status(200).json({

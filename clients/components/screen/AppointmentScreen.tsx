@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Image, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
 import { Divider, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { format, parseISO } from "date-fns";
@@ -31,10 +38,11 @@ interface Appointment {
 
 function AppointmentScreen() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAppointments();
-  }, []);
+  }, [activeFilter]);
 
   const fetchAppointments = async () => {
     try {
@@ -46,7 +54,9 @@ function AppointmentScreen() {
 
       const user = JSON.parse(userString);
       const response = await axios.get<{ appointments: Appointment[] }>(
-        `/appointment/patient?patientId=${user._id}`
+        `/appointment/patient?patientId=${user._id}${
+          activeFilter ? `&status=${activeFilter}` : ""
+        }`
       );
 
       setAppointments(response.data.appointments);
@@ -54,6 +64,13 @@ function AppointmentScreen() {
       console.error("Erreur:", error);
     }
   };
+
+  const filterButtons = [
+    { label: "Tous", value: null },
+    { label: "Terminé", value: "completed" },
+    { label: "En attente", value: "pending" },
+    { label: "Annulé", value: "canceled" },
+  ];
 
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
@@ -88,6 +105,30 @@ function AppointmentScreen() {
     }
   };
 
+  const renderFilterButtons = () => (
+    <View style={styles.filterContainer}>
+      {filterButtons.map((button) => (
+        <TouchableOpacity
+          key={button.label}
+          style={[
+            styles.filterButton,
+            activeFilter === button.value && styles.activeFilterButton,
+          ]}
+          onPress={() => setActiveFilter(button.value)}
+        >
+          <Text
+            style={[
+              styles.filterButtonText,
+              activeFilter === button.value && styles.activeFilterButtonText,
+            ]}
+          >
+            {button.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+
   const renderAppointmentItem = ({ item }: { item: Appointment }) => {
     const appointmentDate = new Date(item.appointmentDate);
     appointmentDate.setHours(appointmentDate.getHours() - 3);
@@ -118,6 +159,7 @@ function AppointmentScreen() {
 
   return (
     <View style={styles.container}>
+      {renderFilterButtons()}
       <FlatList
         data={appointments}
         renderItem={renderAppointmentItem}
@@ -178,6 +220,30 @@ const styles = StyleSheet.create({
   statusIcon: {
     width: 24,
     height: 24,
+  },
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  filterButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#D3D3D3",
+    backgroundColor: "#D3D3D3",
+  },
+  activeFilterButton: {
+    backgroundColor: "#00BFA6",
+    borderColor: "#00BFA6",
+  },
+  filterButtonText: {
+    color: "#4A4A4A",
+    fontFamily: "Poppins",
+  },
+  activeFilterButtonText: {
+    color: "white",
   },
 });
 
