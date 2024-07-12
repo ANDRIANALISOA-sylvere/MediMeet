@@ -86,7 +86,6 @@ function TabNavigation() {
                   {
                     backgroundColor: focused ? "#00BFA6" : "#CCF1E2",
                     borderColor: focused ? "#00BFA6" : "rgba(224, 224, 224, 0)",
-                    borderWidth: 1,
                   },
                 ]}
               >
