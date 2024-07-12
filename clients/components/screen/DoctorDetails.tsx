@@ -158,13 +158,13 @@ function DoctorDetails({ route }: any) {
       <Text style={styles.sectionTitle}>Disponibilité</Text>
       <View style={styles.monthSelector}>
         <TouchableOpacity onPress={() => handleMonthChange(-1)}>
-          <Icon name="arrow-back" fill="#000" style={styles.arrowIcon} />
+          <Icon name="arrow-back" fill="#003366" style={styles.arrowIcon} />
         </TouchableOpacity>
         <Text style={styles.monthText}>
           {format(selectedMonth, "MMMM yyyy")}
         </Text>
         <TouchableOpacity onPress={() => handleMonthChange(1)}>
-          <Icon name="arrow-forward" fill="#000" style={styles.arrowIcon} />
+          <Icon name="arrow-forward" fill="#003366" style={styles.arrowIcon} />
         </TouchableOpacity>
       </View>
 
@@ -259,6 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Poppins-Bold",
     textTransform: "capitalize",
+    color: "#003366",
   },
   specialty: {
     opacity: 0.3,
@@ -269,6 +270,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
     marginTop: 20,
     marginBottom: 10,
+    color: "#003366",
   },
   about: {
     opacity: 0.3,
@@ -284,6 +286,7 @@ const styles = StyleSheet.create({
   monthText: {
     fontSize: 18,
     fontFamily: "Poppins-Bold",
+    color: "#003366",
   },
   arrowIcon: {
     width: 24,
