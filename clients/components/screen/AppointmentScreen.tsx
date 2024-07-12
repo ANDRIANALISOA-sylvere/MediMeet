@@ -6,6 +6,8 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { Divider, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,12 +40,15 @@ interface Appointment {
 function AppointmentScreen() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchAppointments();
   }, [activeFilter]);
 
   const fetchAppointments = async () => {
+    setIsLoading(true);
     try {
       const userString = await AsyncStorage.getItem("user");
       if (!userString) {
@@ -61,7 +66,19 @@ function AppointmentScreen() {
       setAppointments(response.data.appointments);
     } catch (error) {
       console.error("Erreur:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchAppointments().then(() => setRefreshing(false));
+  }, [activeFilter]);
+
+  const handleFilterChange = (newFilter: string | null) => {
+    setActiveFilter(newFilter);
+    setAppointments([]);
   };
 
   const filterButtons = [
@@ -80,7 +97,7 @@ function AppointmentScreen() {
             styles.filterButton,
             activeFilter === button.value && styles.activeFilterButton,
           ]}
-          onPress={() => setActiveFilter(button.value)}
+          onPress={() => handleFilterChange(button.value)}
         >
           <Text
             style={[
@@ -148,11 +165,20 @@ function AppointmentScreen() {
   return (
     <View style={styles.container}>
       {renderFilterButtons()}
-      <FlatList
-        data={appointments}
-        renderItem={renderAppointmentItem}
-        keyExtractor={(item) => item._id}
-      />
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#00BFA6" />
+        </View>
+      ) : (
+        <FlatList
+          data={appointments}
+          renderItem={renderAppointmentItem}
+          keyExtractor={(item) => item._id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+      )}
     </View>
   );
 }
@@ -162,6 +188,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   specialty: {
     fontFamily: "Poppins",
