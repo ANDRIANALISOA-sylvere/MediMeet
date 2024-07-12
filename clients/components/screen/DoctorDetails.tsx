@@ -119,11 +119,36 @@ function DoctorDetails({ route }: any) {
           <Text style={styles.name}>Dr {doctor.name}</Text>
           <Text style={styles.specialty}>{doctor.specialty}</Text>
           <View style={styles.rating}>
-            <Icon name="star" fill="#FFD700" style={styles.starIcon} />
+            <Icon name="star" fill="orange" style={styles.starIcon} />
             <Text style={styles.ratingText}>
               {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
             </Text>
           </View>
+        </View>
+      </View>
+
+      <View style={styles.badgeContainer}>
+        <View style={[styles.badge, styles.experienceBadge]}>
+          <Icon name="clock-outline" fill="#34A853" style={styles.badgeIcon} />
+          <Text style={[styles.badgeText, styles.experienceText]}>
+            {doctor.experience} ans
+          </Text>
+        </View>
+        <View style={[styles.badge, styles.priceBadge]}>
+          <Icon
+            name="pricetags-outline"
+            fill="#FF9800"
+            style={styles.badgeIcon}
+          />
+          <Text style={[styles.badgeText, styles.priceText]}>
+            {doctor.price} Ar
+          </Text>
+        </View>
+        <View style={[styles.badge, styles.locationBadge]}>
+          <Icon name="pin-outline" fill="#2196F3" style={styles.badgeIcon} />
+          <Text style={[styles.badgeText, styles.locationText]}>
+            {doctor.location}
+          </Text>
         </View>
       </View>
 
@@ -169,14 +194,7 @@ function DoctorDetails({ route }: any) {
 
       {selectedDate && (
         <>
-          <Text style={styles.sectionTitle}>
-            choisir l'heure
-            {/* Horaires disponibles pour le{" "}
-            {format(
-              parse(selectedDate, "yyyy/MM/dd", new Date()),
-              "dd/MM/yyyy"
-            )} */}
-          </Text>
+          <Text style={styles.sectionTitle}>choisir l'heure</Text>
           <FlatList
             data={availableTimes}
             keyExtractor={(item) => item}
@@ -244,6 +262,7 @@ const styles = StyleSheet.create({
   },
   specialty: {
     opacity: 0.3,
+    fontFamily: "Poppins",
   },
   sectionTitle: {
     fontSize: 18,
@@ -289,6 +308,7 @@ const styles = StyleSheet.create({
   ratingText: {
     marginLeft: 5,
     opacity: 0.3,
+    fontFamily: "Poppins",
   },
   appointmentButtonText: {
     color: "white",
@@ -332,6 +352,47 @@ const styles = StyleSheet.create({
   },
   selectedTimeSlotText: {
     color: "white",
+  },
+  badgeContainer: {
+    flexDirection: "row",
+    gap: 5,
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeText: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 12,
+  },
+  experienceBadge: {
+    backgroundColor: "#E6F4EA",
+  },
+  experienceText: {
+    color: "#34A853",
+  },
+  priceBadge: {
+    backgroundColor: "#FFF3E0",
+  },
+  priceText: {
+    color: "#FF9800",
+  },
+  locationBadge: {
+    backgroundColor: "#E3F2FD",
+  },
+  locationText: {
+    color: "#2196F3",
+  },
+  badgeIcon: {
+    width: 16,
+    height: 16,
+    marginRight: 4,
   },
 });
 

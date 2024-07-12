@@ -9,8 +9,7 @@ import {
 } from "react-native";
 import { Divider, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { format, parseISO } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
+import { format, isBefore, isToday, isFuture } from "date-fns";
 import axios from "../../api/axios";
 
 interface User {
@@ -72,39 +71,6 @@ function AppointmentScreen() {
     { label: "Annulé", value: "canceled" },
   ];
 
-  const getStatusIcon = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
-        return (
-          <Icon name="clock-outline" fill="#FFA500" style={styles.statusIcon} />
-        );
-      case "canceled":
-        return (
-          <Icon
-            name="close-circle-outline"
-            fill="#FF0000"
-            style={styles.statusIcon}
-          />
-        );
-      case "completed":
-        return (
-          <Icon
-            name="checkmark-circle-outline"
-            fill="#008000"
-            style={styles.statusIcon}
-          />
-        );
-      default:
-        return (
-          <Icon
-            name="question-mark-circle-outline"
-            fill="#808080"
-            style={styles.statusIcon}
-          />
-        );
-    }
-  };
-
   const renderFilterButtons = () => (
     <View style={styles.filterContainer}>
       {filterButtons.map((button) => (
@@ -131,28 +97,50 @@ function AppointmentScreen() {
 
   const renderAppointmentItem = ({ item }: { item: Appointment }) => {
     const appointmentDate = new Date(item.appointmentDate);
-    appointmentDate.setHours(appointmentDate.getHours() - 3);
+    const formattedTime = format(appointmentDate, "HH:mm");
+    const formattedDate = format(appointmentDate, "dd MMM yyyy");
+
+    const getAppointmentStatus = () => {
+      if (isToday(appointmentDate)) return "Aujourd'hui";
+      if (isBefore(appointmentDate, new Date())) return "Antérieur";
+      if (isFuture(appointmentDate)) return "A venir";
+      return "";
+    };
+
+    const getTranslatedStatus = (status: string) => {
+      switch (status.toLowerCase()) {
+        case "completed":
+          return "Terminé";
+        case "canceled":
+          return "Annulé";
+        case "pending":
+          return "En attente";
+        default:
+          return status;
+      }
+    };
+
     return (
-      <View>
-        <View style={styles.appointmentItem}>
-          <Image
-            source={require("../../assets/images/avatar4.jpg")}
-            style={styles.avatar}
-          />
-          <View style={styles.appointmentDetails}>
-            <Text style={styles.doctorName}>Dr {item.doctorId._id.name}</Text>
-            <Text style={styles.specialty}>{item.doctorId.specialty}</Text>
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>
-                {format(appointmentDate, "dd-MM-yyyy HH:mm")}
-              </Text>
-            </View>
+      <View style={styles.appointmentItem}>
+        <View style={styles.leftColumn}>
+          <Text style={styles.appointmentTime}>{formattedTime}</Text>
+          <Text style={styles.appointmentDate}>{formattedDate}</Text>
+        </View>
+        <View style={styles.rightColumn}>
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>
+              {getTranslatedStatus(item.status)}
+            </Text>
           </View>
-          <View style={styles.statusContainer}>
-            {getStatusIcon(item.status)}
+          <Text style={styles.appointmentStatus}>{getAppointmentStatus()}</Text>
+          <View style={styles.doctorInfo}>
+            <Image
+              source={require("../../assets/images/avatar4.jpg")}
+              style={styles.avatar}
+            />
+            <Text style={styles.doctorName}>Dr {item.doctorId._id.name}</Text>
           </View>
         </View>
-        <Divider />
       </View>
     );
   };
@@ -175,15 +163,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#fff",
   },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  doctorName: {
-    fontFamily: "Poppins-Bold",
-    fontSize: 16,
-  },
   specialty: {
     fontFamily: "Poppins",
     fontSize: 14,
@@ -202,11 +181,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontFamily: "Poppins",
     fontSize: 12,
-  },
-  appointmentItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
   },
   appointmentDetails: {
     flex: 1,
@@ -244,6 +218,66 @@ const styles = StyleSheet.create({
   },
   activeFilterButtonText: {
     color: "white",
+  },
+  appointmentItem: {
+    flexDirection: "row",
+    gap: 30,
+    marginBottom: 15,
+    marginTop: 10,
+  },
+  leftColumn: {
+    width: 80,
+  },
+  appointmentTime: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 18,
+    color: "#003366", // Bleu foncé
+  },
+  appointmentDate: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 14,
+    color: "#00BFA6", // Couleur de base (vert)
+  },
+  rightColumn: {
+    flex: 1,
+    backgroundColor: "#E6F4EA", // Vert clair
+    borderRadius: 8,
+    padding: 10,
+  },
+  statusBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#003366", // Bleu foncé
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 1,
+    marginBottom: 5,
+  },
+  statusText: {
+    color: "white",
+    fontFamily: "Poppins-Bold",
+    fontSize: 12,
+  },
+  appointmentStatus: {
+    color: "#003366",
+    fontFamily: "Poppins-Bold",
+    fontSize: 22,
+    marginBottom: 5,
+  },
+  doctorInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 10,
+  },
+  doctorName: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 14,
+    color: "black",
+    opacity: 0.5,
   },
 });
 
