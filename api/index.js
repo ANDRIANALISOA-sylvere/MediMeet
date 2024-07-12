@@ -12,10 +12,15 @@ const DoctorRouter = require("./routes/Doctor.route");
 const PatientRouter = require("./routes/Patient.route");
 const ReviewRouter = require("./routes/Review.route");
 const MedicalRecord = require("./routes/MedicalRecord.route");
+const http = require("http");
+const socketIo = require("socket.io");
 
+connectDB();
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const server = http.createServer(app);
 
 app.use(
   session({
@@ -35,7 +40,35 @@ require("./config/passport");
 
 const PORT = process.env.PORT || 8800;
 
-connectDB();
+io.on("connection", (socket) => {
+  console.log("Un utilisateur s'est connecté");
+
+  socket.on("join", (roomId) => {
+    socket.join(roomId);
+    console.log(`L'utilisateur a rejoint la salle ${roomId}`);
+  });
+
+  socket.on("sendMessage", async (data) => {
+    const { senderId, receiverId, content, roomId } = data;
+    try {
+      const newMessage = new Message({
+        senderId,
+        receiverId,
+        content,
+        timestamp: new Date().toISOString(),
+        read: false,
+      });
+      await newMessage.save();
+      io.to(roomId).emit("message", newMessage);
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement du message:", error);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Un utilisateur s'est déconnecté");
+  });
+});
 
 app.use("/api", userRoute);
 app.use("/api", AppointmentRouter);
