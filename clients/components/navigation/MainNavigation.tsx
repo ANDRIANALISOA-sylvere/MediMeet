@@ -40,6 +40,9 @@ function TabNavigation() {
             backgroundColor: "#003366",
             borderRadius: 50,
             margin: 10,
+            paddingBottom: 10,
+            paddingTop: 10,
+            height: 70,
           },
         }}
       >
