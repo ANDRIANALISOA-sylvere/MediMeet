@@ -154,7 +154,14 @@ function MainNavigation() {
       <Stack.Screen
         name="DoctorDetails"
         component={DoctorDetails}
-        options={{ title: "Détails du médecin" }}
+        options={{
+          headerShown: true,
+          title: "Détails du médecin",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
       />
     </Stack.Navigator>
   );

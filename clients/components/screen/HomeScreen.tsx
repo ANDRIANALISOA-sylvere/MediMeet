@@ -121,7 +121,7 @@ function HomeScreen({ navigation }: any) {
                 <Text style={styles.doctorName}>Dr. {doctor.name}</Text>
                 <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
                 <View style={styles.ratingContainer}>
-                  <Icon name="star" style={styles.starIcon} fill="#FFD700" />
+                  <Icon name="star" style={styles.starIcon} fill="orange" />
                   <Text style={styles.ratingText}>
                     {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
                   </Text>
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.4,
     fontFamily: "Poppins",
-    color:"#003366"
+    color: "#003366",
   },
   ratingContainer: {
     flexDirection: "row",
