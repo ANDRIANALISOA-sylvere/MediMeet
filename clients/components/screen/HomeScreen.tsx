@@ -90,9 +90,15 @@ function HomeScreen({ navigation }: any) {
       </View>
 
       <View style={styles.populaire}>
-        <Text style={{ fontFamily: "Poppins-Bold" }}>Médecin populaire</Text>
+        <Text style={{ fontFamily: "Poppins-Bold", color: "#003366" }}>
+          Médecin populaire
+        </Text>
         <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
-          <Text style={{ opacity: 0.3, fontFamily: "Poppins" }}>Voir tous</Text>
+          <Text
+            style={{ opacity: 0.3, fontFamily: "Poppins", color: "#003366" }}
+          >
+            Voir tous
+          </Text>
           <Icon
             name="arrow-ios-forward-outline"
             style={[styles.icon, { opacity: 0.3 }]}
@@ -164,18 +170,19 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     fontSize: 15,
-    color: "#000",
+    color: "#003366",
     fontFamily: "Poppins",
   },
   nameText: {
     fontSize: 18,
-    color: "#000",
+    color: "#003366",
     fontFamily: "Poppins-Bold",
     textTransform: "capitalize",
   },
   icon: {
     width: 24,
     height: 24,
+    color: "#003366",
   },
   searchContainer: {
     flexDirection: "row",
@@ -242,11 +249,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "Poppins-Bold",
     textTransform: "capitalize",
+    color: "#003366",
   },
   doctorSpecialty: {
     fontSize: 14,
     opacity: 0.4,
     fontFamily: "Poppins",
+    color:"#003366"
   },
   ratingContainer: {
     flexDirection: "row",
@@ -272,7 +281,7 @@ const styles = StyleSheet.create({
   feesLabel: {
     fontSize: 16,
     fontFamily: "Poppins-Bold",
-    color: "#000",
+    color: "#003366",
   },
   feesValue: {
     fontSize: 16,
