@@ -38,8 +38,6 @@ function TabNavigation() {
           tabBarInactiveTintColor: "white",
           tabBarStyle: {
             backgroundColor: "#003366",
-            borderRadius: 50,
-            margin: 10,
             paddingBottom: 10,
             paddingTop: 10,
             height: 70,
@@ -50,7 +48,7 @@ function TabNavigation() {
           name="Home"
           component={HomeStack}
           options={{
-            tabBarShowLabel: false,
+            title: "Accueil",
             headerShown: false,
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
@@ -65,7 +63,7 @@ function TabNavigation() {
           name="Chat"
           component={ChatScreen}
           options={{
-            tabBarShowLabel: false,
+            title: "Messages",
             headerShown: false,
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
@@ -80,22 +78,14 @@ function TabNavigation() {
           name="Appointments"
           component={AppointmentScreen}
           options={{
-            tabBarShowLabel: false,
+            title: "Rendez-vous",
             headerShown: false,
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={[
-                  styles.ctaButton,
-                  {
-                    backgroundColor: focused ? "#00BFA6" : "#CCF1E2",
-                    borderColor: focused ? "#00BFA6" : "rgba(224, 224, 224, 0)",
-                  },
-                ]}
-              >
+            tabBarIcon: ({ color, size, focused }) => (
+              <View style={styles.ctaButton}>
                 <Icon
                   name={focused ? "calendar" : "calendar-outline"}
-                  fill={focused ? "white" : "#003366"}
-                  style={styles.appointmentIcon}
+                  fill={color}
+                  style={{ width: size, height: size }}
                 />
               </View>
             ),
@@ -105,7 +95,7 @@ function TabNavigation() {
           name="Notifications"
           component={NotificationScreen}
           options={{
-            tabBarShowLabel: false,
+            title: "Notifications",
             headerShown: false,
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
@@ -121,7 +111,7 @@ function TabNavigation() {
           name="Account"
           component={AccountScreen}
           options={{
-            tabBarShowLabel: false,
+            title: "Compte",
             headerShown: false,
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
@@ -186,11 +176,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 60,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 2,
-    elevation: 1,
   },
   appointmentIcon: {
     width: 40,
