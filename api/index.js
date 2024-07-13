@@ -15,6 +15,7 @@ const MedicalRecord = require("./routes/MedicalRecord.route");
 const http = require("http");
 const { Server } = require("socket.io");
 const Message = require("./models/Message.model");
+const MessageRouter = require("./routes/Message.route");
 
 dotenv.config();
 
@@ -83,6 +84,7 @@ app.use("/api", DoctorRouter);
 app.use("/api", PatientRouter);
 app.use("/api", ReviewRouter);
 app.use("/api", MedicalRecord);
+app.use("/api", MessageRouter);
 
 server.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);

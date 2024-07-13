@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import io, { Socket } from "socket.io-client";
-import { Input, Text } from "@ui-kitten/components";
+import { Button, Input, Text } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "../../../api/axios";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
+
 interface Message {
   senderId: string;
   receiverId: string;
@@ -46,7 +48,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
 
     fetchUserId();
   }, []);
-
+  
   useEffect(() => {
     if (userId) {
       const newSocket = io(SOCKET_URL);
@@ -58,6 +60,18 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
         setMessages((prevMessages) => [...prevMessages, newMessage]);
       });
 
+      const loadMessages = async () => {
+        try {
+          const response = await axios.get(
+            `/messages/${userId}/${doctor._id._id}`
+          );
+          setMessages(response.data);
+        } catch (error) {
+          console.error("Erreur lors du chargement des messages:", error);
+        }
+      };
+
+      loadMessages();
       return () => {
         newSocket.disconnect();
       };
@@ -80,19 +94,34 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
     }
   };
 
+  const renderMessage = ({ item }: { item: Message }) => (
+    <View
+      style={
+        item.senderId === userId ? styles.sentMessage : styles.receivedMessage
+      }
+    >
+      <Text>{item.content}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Chat avec Dr. {doctor._id.name}</Text>
-      {messages.map((msg, index) => (
-        <Text key={index}>{msg.content}</Text>
-      ))}
-      <Input
-        value={message}
-        onChangeText={setMessage}
-        placeholder="Tapez votre message..."
-        onSubmitEditing={sendMessage}
-        style={styles.input}
+      <FlatList
+        data={messages}
+        renderItem={renderMessage}
+        keyExtractor={(item, index) => index.toString()}
+        style={styles.messageList}
       />
+      <View style={styles.inputContainer}>
+        <Input
+          value={message}
+          onChangeText={setMessage}
+          placeholder="Tapez votre message..."
+          style={styles.input}
+        />
+        <Button onPress={sendMessage}>Envoyer</Button>
+      </View>
     </View>
   );
 }
@@ -107,8 +136,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
   },
-  input: {
+  messageList: {
+    flex: 1,
+  },
+  sentMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#DCF8C6",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  receivedMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#ECECEC",
+    padding: 10,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  inputContainer: {
+    flexDirection: "row",
     marginTop: 20,
+  },
+  input: {
+    flex: 1,
+    marginRight: 10,
   },
 });
 
