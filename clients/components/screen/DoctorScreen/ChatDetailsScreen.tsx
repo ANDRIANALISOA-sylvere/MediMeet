@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import io, { Socket } from "socket.io-client";
-import { Button, Input, Text } from "@ui-kitten/components";
+import { Button, Icon, Input, Text } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import { ImageBackground } from "react-native";
@@ -120,7 +120,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Chat avec Dr. {doctor._id.name}</Text>
+        <Text style={styles.title}>Dr. {doctor._id.name}</Text>
         <KeyboardAwareScrollView
           ref={scrollViewRef}
           style={styles.messageList}
@@ -133,15 +133,21 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
             </React.Fragment>
           ))}
         </KeyboardAwareScrollView>
-        <View style={styles.inputContainer}>
-          <Input
-            value={message}
-            onChangeText={setMessage}
-            placeholder="Tapez votre message..."
-            style={styles.input}
-          />
-          <Button onPress={sendMessage}>Envoyer</Button>
-        </View>
+      </View>
+      <View style={styles.inputContainer}>
+        <Input
+          value={message}
+          onChangeText={setMessage}
+          placeholder="Message"
+          style={styles.input}
+          textStyle={styles.inputText}
+        />
+        <Button
+          onPress={sendMessage}
+          style={styles.sendButton}
+          accessoryLeft={<Icon name="paper-plane-outline" fill="white" />}
+          status="control"
+        />
       </View>
     </ImageBackground>
   );
@@ -159,8 +165,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
     marginBottom: 20,
+    fontFamily: "Poppins-Bold",
+    color: "#003366",
+    textTransform: "capitalize",
   },
   messageList: {
     flex: 1,
@@ -181,11 +189,24 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "row",
-    marginTop: 20,
+    alignItems:"center",
+    padding: 5,
   },
   input: {
     flex: 1,
     marginRight: 10,
+    borderRadius: 15,
+    borderColor: "white",
+    borderWidth: 1,
+  },
+  inputText: {
+    paddingHorizontal: 2,
+  },
+  sendButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#00BFA6",
   },
   scrollViewContent: {
     flexGrow: 1,
