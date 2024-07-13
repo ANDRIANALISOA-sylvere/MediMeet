@@ -16,7 +16,8 @@ interface Message {
   timestamp: string;
   read: boolean;
 }
-interface Doctor {
+
+interface Patient {
   _id: {
     _id: string;
     name: string;
@@ -24,12 +25,12 @@ interface Doctor {
 }
 
 interface RouteParams {
-  doctor: Doctor;
+  patient: Patient;
   roomId: string;
 }
 
-function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
-  const { doctor, roomId } = route.params;
+function MessageDetails({ route }: { route: { params: RouteParams } }) {
+  const { patient, roomId } = route.params;
   const [socket, setSocket] = useState<Socket | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -67,7 +68,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
       const loadMessages = async () => {
         try {
           const response = await axios.get(
-            `/messages/${userId}/${doctor._id._id}`
+            `/messages/${userId}/${patient._id._id}`
           );
           setMessages(response.data);
         } catch (error) {
@@ -94,7 +95,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
         roomId: string;
       } = {
         senderId: userId,
-        receiverId: doctor._id._id,
+        receiverId: patient._id._id,
         content: message,
         roomId: roomId,
       };
@@ -120,7 +121,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Chat avec Dr. {doctor._id.name}</Text>
+        <Text style={styles.title}>Chat avec {patient._id.name}</Text>
         <KeyboardAwareScrollView
           ref={scrollViewRef}
           style={styles.messageList}
@@ -193,4 +194,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ChatDetailsScreen;
+export default MessageDetails;

@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  Text,
-  View,
-  FlatList,
-  StyleSheet,
-  Image,
-} from "react-native";
+import { Text, View, FlatList, StyleSheet, Image } from "react-native";
 import axios from "../../api/axios";
 import { Input, Icon } from "@ui-kitten/components";
 import io, { Socket } from "socket.io-client";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
 
@@ -44,8 +39,22 @@ function ChatScreen({ navigation }: any) {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const userData = await AsyncStorage.getItem("user");
+        if (userData) {
+          const user = JSON.parse(userData);
+          setUserId(user._id);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'userId:", error);
+      }
+    };
+
+    fetchUserId();
     fetchDoctors();
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
@@ -68,14 +77,17 @@ function ChatScreen({ navigation }: any) {
   };
 
   const handleDoctorPress = (doctor: any) => {
-    if (socket) {
-      const roomId = `${doctor._id._id}_${Date.now()}`;
+    if (socket && userId) {
+      const participantIds = [userId, doctor._id._id].sort();
+      const roomId = participantIds.join("_");
 
       socket.emit("join", roomId);
 
       navigation.navigate("ChatDetails", { doctor, roomId });
     } else {
-      console.error("La connexion socket n'est pas établie");
+      console.error(
+        "La connexion socket n'est pas établie ou l'userId n'est pas disponible"
+      );
     }
   };
 
