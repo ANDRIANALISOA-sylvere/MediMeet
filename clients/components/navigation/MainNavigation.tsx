@@ -15,6 +15,7 @@ import ChatScreen from "../screen/ChatScreen";
 import NotificationScreen from "../screen/NotificationScreen";
 import AccountScreen from "../screen/AccountScreen";
 import DoctorDetails from "../screen/DoctorDetails";
+import ChatDetailsScreen from "../screen/DoctorScreen/ChatDetailsScreen";
 
 function HomeStack() {
   return (
@@ -180,6 +181,18 @@ function MainNavigation() {
         options={{
           headerShown: true,
           title: "Détails du médecin",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="ChatDetails"
+        component={ChatDetailsScreen}
+        options={{
+          headerShown: true,
+          title: "Messages",
           headerTitleStyle: {
             fontFamily: "Poppins-Bold",
             color: "#003366",

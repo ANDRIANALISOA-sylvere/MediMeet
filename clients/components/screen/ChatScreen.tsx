@@ -5,10 +5,13 @@ import {
   FlatList,
   StyleSheet,
   Image,
-  TextInput,
 } from "react-native";
 import axios from "../../api/axios";
-import { Divider, Input, Icon } from "@ui-kitten/components";
+import { Input, Icon } from "@ui-kitten/components";
+import io, { Socket } from "socket.io-client";
+import { TouchableOpacity } from "react-native-gesture-handler";
+
+const SOCKET_URL = "http://192.168.43.149:8800";
 
 interface Doctor {
   _id: {
@@ -35,14 +38,22 @@ interface Doctor {
   updatedAt: string;
 }
 
-function ChatScreen() {
+function ChatScreen({ navigation }: any) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     fetchDoctors();
+    const newSocket = io(SOCKET_URL);
+    setSocket(newSocket);
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+      }
+    };
   }, []);
 
   const fetchDoctors = async () => {
@@ -56,19 +67,33 @@ function ChatScreen() {
     }
   };
 
+  const handleDoctorPress = (doctor: any) => {
+    if (socket) {
+      const roomId = `${doctor._id._id}_${Date.now()}`;
+
+      socket.emit("join", roomId);
+
+      navigation.navigate("ChatDetails", { doctor, roomId });
+    } else {
+      console.error("La connexion socket n'est pas établie");
+    }
+  };
+
   const SearchIcon = (props: any) => <Icon {...props} name="search-outline" />;
 
   const renderDoctorItem = ({ item }: { item: Doctor }) => (
-    <View style={styles.doctorItem}>
-      <Image
-        source={require("../../assets/images/docteur.webp")}
-        style={styles.avatar}
-      />
-      <View style={styles.doctorInfo}>
-        <Text style={styles.doctorName}>Dr. {item._id.name}</Text>
-        <Text style={styles.doctorSpecialty}>{item.specialty}</Text>
+    <TouchableOpacity onPress={() => handleDoctorPress(item)}>
+      <View style={styles.doctorItem}>
+        <Image
+          source={require("../../assets/images/docteur.webp")}
+          style={styles.avatar}
+        />
+        <View style={styles.doctorInfo}>
+          <Text style={styles.doctorName}>Dr. {item._id.name}</Text>
+          <Text style={styles.doctorSpecialty}>{item.specialty}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   if (loading) {

@@ -13,15 +13,20 @@ const PatientRouter = require("./routes/Patient.route");
 const ReviewRouter = require("./routes/Review.route");
 const MedicalRecord = require("./routes/MedicalRecord.route");
 const http = require("http");
-const socketIo = require("socket.io");
+const { Server } = require("socket.io");
 const Message = require("./models/Message.model");
 
 dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
 
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 app.use(
   session({
@@ -48,7 +53,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     console.log(`L'utilisateur a rejoint la salle ${roomId}`);
   });
-  
+
   socket.on("sendMessage", async (data) => {
     const { senderId, receiverId, content, roomId } = data;
     try {
@@ -65,7 +70,7 @@ io.on("connection", (socket) => {
       console.error("Erreur lors de l'enregistrement du message:", error);
     }
   });
-  
+
   socket.on("disconnect", () => {
     console.log("Un utilisateur s'est déconnecté");
   });
@@ -79,6 +84,6 @@ app.use("/api", PatientRouter);
 app.use("/api", ReviewRouter);
 app.use("/api", MedicalRecord);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);
 });
