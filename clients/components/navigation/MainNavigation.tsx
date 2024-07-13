@@ -48,8 +48,13 @@ function TabNavigation() {
           name="Home"
           component={HomeStack}
           options={{
-            title: "Accueil",
+            title: "Acceuil",
             headerShown: false,
+            tabBarLabel: "Acceuil",
+            tabBarLabelStyle: {
+              fontFamily: "Poppins",
+              fontSize: 10,
+            },
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
                 name={focused ? "home" : "home-outline"}
@@ -65,6 +70,11 @@ function TabNavigation() {
           options={{
             title: "Messages",
             headerShown: false,
+            tabBarLabel: "Messages",
+            tabBarLabelStyle: {
+              fontFamily: "Poppins",
+              fontSize: 10,
+            },
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
                 name={focused ? "message-square" : "message-square-outline"}
@@ -80,6 +90,11 @@ function TabNavigation() {
           options={{
             title: "Rendez-vous",
             headerShown: false,
+            tabBarLabel: "Rendez-vous",
+            tabBarLabelStyle: {
+              fontFamily: "Poppins",
+              fontSize: 10,
+            },
             tabBarIcon: ({ color, size, focused }) => (
               <View style={styles.ctaButton}>
                 <Icon
@@ -97,6 +112,11 @@ function TabNavigation() {
           options={{
             title: "Notifications",
             headerShown: false,
+            tabBarLabel: "Notifications",
+            tabBarLabelStyle: {
+              fontFamily: "Poppins",
+              fontSize: 10,
+            },
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
                 name={focused ? "bell" : "bell-outline"}
@@ -113,6 +133,11 @@ function TabNavigation() {
           options={{
             title: "Compte",
             headerShown: false,
+            tabBarLabel: "Compte",
+            tabBarLabelStyle: {
+              fontFamily: "Poppins",
+              fontSize: 10,
+            },
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
                 name={focused ? "person" : "person-outline"}
