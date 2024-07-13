@@ -37,8 +37,13 @@ function DoctorNavigation() {
       initialRouteName="Accueil"
       screenOptions={{
         tabBarActiveTintColor: "#00BFA6",
-        tabBarStyle: { paddingVertical: 10 },
-        tabBarLabelStyle: { fontSize: 10, paddingVertical: 5 },
+        tabBarInactiveTintColor: "white",
+        tabBarStyle: {
+          backgroundColor: "#003366",
+          paddingBottom: 10,
+          paddingTop: 10,
+          height: 70,
+        },
       }}
     >
       <Tab.Screen
@@ -47,6 +52,10 @@ function DoctorNavigation() {
         options={{
           tabBarLabel: "Accueil",
           headerShown: false,
+          tabBarLabelStyle: {
+            fontFamily: "Poppins",
+            fontSize: 10,
+          },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
               name={focused ? "home" : "home-outline"}
@@ -63,8 +72,9 @@ function DoctorNavigation() {
           tabBarLabel: "Patients",
           headerShown: true,
           title: "Mes patients",
-          headerTitleStyle: {
-            fontFamily: "Poppins-Bold",
+          tabBarLabelStyle: {
+            fontFamily: "Poppins",
+            fontSize: 10,
           },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
@@ -79,27 +89,19 @@ function DoctorNavigation() {
         name="RendezVous"
         component={AppointmentsScreen}
         options={{
-          tabBarLabel: () => null,
-          headerShown: true,
           title: "Rendez-vous",
-          headerTitleStyle: {
-            fontFamily: "Poppins-Bold",
+          headerShown: false,
+          tabBarLabel: "Rendez-vous",
+          tabBarLabelStyle: {
+            fontFamily: "Poppins",
+            fontSize: 10,
           },
-          tabBarIcon: ({ focused }) => (
-            <View
-              style={[
-                styles.ctaButton,
-                {
-                  backgroundColor: focused ? "#00BFA6" : "white",
-                  borderColor: focused ? "#00BFA6" : "rgba(224, 224, 224, 0)",
-                  borderWidth: 1,
-                },
-              ]}
-            >
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={styles.ctaButton}>
               <Icon
                 name={focused ? "calendar" : "calendar-outline"}
-                fill={focused ? "white" : "#8e8e8e"}
-                style={styles.appointmentIcon}
+                fill={color}
+                style={{ width: size, height: size }}
               />
             </View>
           ),
@@ -111,6 +113,10 @@ function DoctorNavigation() {
         options={{
           tabBarLabel: "Messages",
           headerShown: false,
+          tabBarLabelStyle: {
+            fontFamily: "Poppins",
+            fontSize: 10,
+          },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
               name={focused ? "message-square" : "message-square-outline"}
@@ -127,8 +133,9 @@ function DoctorNavigation() {
           tabBarLabel: "Compte",
           headerShown: true,
           title: "Mon compte",
-          headerTitleStyle: {
-            fontFamily: "Poppins-Bold",
+          tabBarLabelStyle: {
+            fontFamily: "Poppins",
+            fontSize: 10,
           },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
@@ -174,11 +181,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 50,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 2,
-    elevation: 1,
   },
   appointmentIcon: {
     width: 40,
