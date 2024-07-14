@@ -166,8 +166,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
     marginBottom: 20,
+    fontFamily: "Poppins-Bold",
+    color: "#003366",
+    textTransform: "capitalize",
   },
   messageList: {
     flex: 1,
