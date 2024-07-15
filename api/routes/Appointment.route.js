@@ -4,10 +4,12 @@ const {
   CanceleAppointment,
   CompleteAppointment,
   GetAppointmentByPatient,
+  GetAppointmentByDoctor,
 } = require("../controllers/Appointment.controller");
 const router = express.Router();
 
 router.get("/appointment/patient", GetAppointmentByPatient);
+router.get("/apointment/doctor", GetAppointmentByDoctor);
 router.post("/appointment", AddAppointment);
 router.post("/appointment/cancel", CanceleAppointment);
 router.post("/appointment/complete", CompleteAppointment);
