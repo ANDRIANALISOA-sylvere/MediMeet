@@ -117,7 +117,7 @@ function MessageDetails({ route }: { route: { params: RouteParams } }) {
 
   return (
     <ImageBackground
-      source={require("../../../assets/images/more-leaves-on-green.png")}
+      source={require("../../../assets/images/double-bubble-outline.png")}
       style={styles.backgroundImage}
     >
       <View style={styles.container}>
@@ -192,6 +192,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 5,
+    backgroundColor: "#35b2a2",
   },
   input: {
     flex: 1,

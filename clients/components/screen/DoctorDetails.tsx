@@ -119,7 +119,20 @@ function DoctorDetails({ route }: any) {
           <Text style={styles.name}>Dr {doctor.name}</Text>
           <Text style={styles.specialty}>{doctor.specialty}</Text>
           <View style={styles.rating}>
-            <Icon name="star" fill="orange" style={styles.starIcon} />
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Icon
+                key={star}
+                name={
+                  star <= Math.round(doctor.averageRating)
+                    ? "star"
+                    : "star-outline"
+                }
+                fill={
+                  star <= Math.round(doctor.averageRating) ? "orange" : "gray"
+                }
+                style={styles.starIcon}
+              />
+            ))}
             <Text style={styles.ratingText}>
               {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
             </Text>
