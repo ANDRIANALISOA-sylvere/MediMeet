@@ -85,7 +85,7 @@ function AppointmentScreen() {
     { label: "Tous", value: null },
     { label: "Terminé", value: "completed" },
     { label: "En attente", value: "pending" },
-    { label: "Annulé", value: "canceled" },
+    { label: "Annulé", value: "cancelled" },
   ];
 
   const renderFilterButtons = () => (
@@ -128,7 +128,7 @@ function AppointmentScreen() {
       switch (status.toLowerCase()) {
         case "completed":
           return "Terminé";
-        case "canceled":
+        case "cancelled":
           return "Annulé";
         case "pending":
           return "En attente";

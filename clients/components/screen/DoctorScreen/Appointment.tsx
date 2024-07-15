@@ -79,7 +79,7 @@ function Appointment() {
     { label: "Tous", value: null },
     { label: "Terminé", value: "completed" },
     { label: "En attente", value: "pending" },
-    { label: "Annulé", value: "canceled" },
+    { label: "Annulé", value: "cancelled" },
   ];
 
   const renderFilterButtons = () => (
