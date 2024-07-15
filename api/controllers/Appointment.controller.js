@@ -30,7 +30,7 @@ const CanceleAppointment = async (req, res) => {
   const { id } = req.query;
   try {
     let appointment = await Appointment.findByIdAndUpdate(id, {
-      status: "canceled",
+      status: "cancelled",
     });
 
     if (!appointment) {
