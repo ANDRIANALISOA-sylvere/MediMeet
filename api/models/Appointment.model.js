@@ -8,7 +8,7 @@ const appointementSchema = new Schema(
     appointmentDate: { type: Date, required: true },
     status: {
       type: String,
-      enum: ["pending", "canceled", "completed"],
+      enum: ["pending", "cancelled", "completed"],
       required: true,
       default: "pending",
     },

@@ -109,15 +109,16 @@ function Appointment() {
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "completed":
-        return "#4CAF50";
-      case "canceled":
-        return "#F44336";
+        return { text: "#34A853", background: "rgba(52, 168, 83, 0.1)" };
+      case "cancelled":
+        return { text: "#FF3B30", background: "rgba(255, 59, 48, 0.1)" };
       case "pending":
-        return "#FFA000";
+        return { text: "#FFA000", background: "rgba(255, 160, 0, 0.1)" };
       default:
-        return "#00BFA6";
+        return { text: "#00BFA6", background: "rgba(0, 191, 166, 0.1)" };
     }
   };
+
   const renderAppointmentItem = ({ item }: { item: Appointment }) => {
     const appointmentDate = new Date(item.appointmentDate);
     const formattedTime = format(appointmentDate, "HH:mm");
@@ -143,7 +144,7 @@ function Appointment() {
       }
     };
 
-    const statusColor = getStatusColor(item.status);
+    const statusColors = getStatusColor(item.status);
 
     return (
       <View style={styles.appointmentItem}>
@@ -161,9 +162,12 @@ function Appointment() {
               {getAppointmentStatus()}
             </Text>
             <View
-              style={[styles.statusBadge, { backgroundColor: statusColor }]}
+              style={[
+                styles.statusBadge,
+                { backgroundColor: statusColors.background },
+              ]}
             >
-              <Text style={styles.statusText}>
+              <Text style={[styles.statusText, { color: statusColors.text }]}>
                 {getTranslatedStatus(item.status)}
               </Text>
             </View>
@@ -259,13 +263,12 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     alignSelf: "flex-start",
-    borderRadius: 15,
+    borderRadius: 20,
     paddingHorizontal: 10,
-    paddingVertical: 1,
+    paddingVertical: 5,
     marginBottom: 5,
   },
   statusText: {
-    color: "white",
     fontFamily: "Poppins-Bold",
     fontSize: 12,
   },
