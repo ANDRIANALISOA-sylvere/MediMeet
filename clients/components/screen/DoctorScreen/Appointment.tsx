@@ -20,7 +20,7 @@ interface User {
 
 interface Patient {
   _id: User;
-  // Ajoutez d'autres propriétés du patient si nécessaire
+  name: string;
 }
 
 interface Appointment {
@@ -106,6 +106,18 @@ function Appointment() {
     </View>
   );
 
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "#4CAF50";
+      case "canceled":
+        return "#F44336";
+      case "pending":
+        return "#FFA000";
+      default:
+        return "#00BFA6";
+    }
+  };
   const renderAppointmentItem = ({ item }: { item: Appointment }) => {
     const appointmentDate = new Date(item.appointmentDate);
     const formattedTime = format(appointmentDate, "HH:mm");
@@ -131,25 +143,35 @@ function Appointment() {
       }
     };
 
+    const statusColor = getStatusColor(item.status);
+
     return (
       <View style={styles.appointmentItem}>
         <View style={styles.leftColumn}>
           <Image
-            source={require("../../assets/images/avatar4.jpg")}
+            source={require("../../../assets/images/avatar4.jpg")}
             style={styles.avatar}
           />
         </View>
         <View style={styles.rightColumn}>
-          <View style={styles.statusBadge}>
-            <Text style={styles.statusText}>
-              {getTranslatedStatus(item.status)}
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <Text style={styles.appointmentStatus}>
+              {getAppointmentStatus()}
             </Text>
+            <View
+              style={[styles.statusBadge, { backgroundColor: statusColor }]}
+            >
+              <Text style={styles.statusText}>
+                {getTranslatedStatus(item.status)}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.appointmentStatus}>{getAppointmentStatus()}</Text>
           <Text style={styles.appointmentDateTime}>
             {formattedDate} à {formattedTime}
           </Text>
-          <Text style={styles.patientName}>{item.patientId._id.name}</Text>
+          <Text style={styles.patientName}>{item.patientId.name}</Text>
         </View>
       </View>
     );
@@ -214,7 +236,10 @@ const styles = StyleSheet.create({
   appointmentItem: {
     flexDirection: "row",
     marginBottom: 15,
-    marginTop: 10,
+    marginTop: 5,
+    backgroundColor: "#F5F5F5",
+    borderRadius: 8,
+    padding: 5,
   },
   leftColumn: {
     width: 80,
@@ -228,14 +253,12 @@ const styles = StyleSheet.create({
   },
   rightColumn: {
     flex: 1,
-    backgroundColor: "#E6F4EA",
     borderRadius: 8,
     padding: 10,
     marginLeft: 10,
   },
   statusBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#00BFA6",
     borderRadius: 15,
     paddingHorizontal: 10,
     paddingVertical: 1,

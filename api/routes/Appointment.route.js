@@ -9,7 +9,7 @@ const {
 const router = express.Router();
 
 router.get("/appointment/patient", GetAppointmentByPatient);
-router.get("/apointment/doctor", GetAppointmentByDoctor);
+router.get("/appointment/doctor", GetAppointmentByDoctor);
 router.post("/appointment", AddAppointment);
 router.post("/appointment/cancel", CanceleAppointment);
 router.post("/appointment/complete", CompleteAppointment);
