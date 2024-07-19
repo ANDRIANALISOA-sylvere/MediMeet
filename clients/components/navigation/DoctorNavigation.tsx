@@ -14,24 +14,9 @@ import MessagesScreen from "../screen/DoctorScreen/Message";
 import AppointmentsScreen from "../screen/DoctorScreen/Appointment";
 import PatientsScreen from "../screen/DoctorScreen/Patient";
 import AccountScreen from "../screen/DoctorScreen/Account";
-import MessageDetails from "../screen/DoctorScreen/MessageDetails"; // Assurez-vous que le chemin est correct
+import MessageDetails from "../screen/DoctorScreen/MessageDetails";
 
 function DoctorNavigation() {
-  const [loaded, error] = useFonts({
-    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
-    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
-  });
-
-  useEffect(() => {
-    if (loaded || error) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error]);
-
-  if (!loaded && !error) {
-    return null;
-  }
-
   return (
     <Tab.Navigator
       initialRouteName="Accueil"
@@ -75,6 +60,9 @@ function DoctorNavigation() {
           tabBarLabelStyle: {
             fontFamily: "Poppins",
             fontSize: 10,
+          },
+          headerTitleStyle: {
+            fontFamily: "Poppins",
           },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
@@ -151,6 +139,20 @@ function DoctorNavigation() {
 }
 
 function DoctorMainNavigation() {
+  const [loaded, error] = useFonts({
+    Poppins: require("../../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
   return (
     <Stack.Navigator>
       <Stack.Screen

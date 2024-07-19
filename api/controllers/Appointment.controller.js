@@ -161,10 +161,56 @@ const GetAppointmentByDoctor = async (req, res) => {
   }
 };
 
+const GetDoctorPatients = async (req, res) => {
+  const { doctorId } = req.query;
+
+  try {
+    if (!doctorId) {
+      return res.status(400).json({ message: "L'ID du docteur est requis" });
+    }
+
+    const appointments = await Appointment.find({ doctorId }).populate({
+      path: "patientId",
+      model: "User",
+      select: "name email",
+    });
+
+    if (appointments.length === 0) {
+      return res.status(404).json({
+        message: "Aucun patient trouvé pour ce docteur",
+      });
+    }
+
+    const uniquePatients = appointments.reduce((acc, appointment) => {
+      const patientExists = acc.find(
+        (patient) =>
+          patient._id.toString() === appointment.patientId._id.toString()
+      );
+      if (!patientExists) {
+        acc.push(appointment.patientId);
+      }
+      return acc;
+    }, []);
+
+    res.status(200).json({
+      message: "Liste des patients récupérée avec succès",
+      count: uniquePatients.length,
+      patients: uniquePatients,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des patients:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des patients",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   AddAppointment,
   CanceleAppointment,
   CompleteAppointment,
   GetAppointmentByPatient,
-  GetAppointmentByDoctor
+  GetAppointmentByDoctor,
+  GetDoctorPatients
 };
