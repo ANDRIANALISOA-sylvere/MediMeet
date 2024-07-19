@@ -8,10 +8,13 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Modal,
+  Pressable,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { format, isBefore, isToday, isFuture } from "date-fns";
 import axios from "../../../api/axios";
+import { Button, Icon } from "@ui-kitten/components";
 
 interface User {
   _id: string;
@@ -36,6 +39,9 @@ function Appointment() {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
 
   useEffect(() => {
     fetchAppointments();
@@ -73,6 +79,24 @@ function Appointment() {
   const handleFilterChange = (newFilter: string | null) => {
     setActiveFilter(newFilter);
     setAppointments([]);
+  };
+
+  const handleAppointmentAction = async (action: "confirm" | "cancel") => {
+    if (!selectedAppointment) return;
+
+    try {
+      // Ici, vous devrez implémenter la logique pour confirmer ou annuler le rendez-vous
+      // Par exemple, faire un appel API pour mettre à jour le statut du rendez-vous
+      // await axios.put(`/appointment/${selectedAppointment._id}`, { status: action === 'confirm' ? 'confirmed' : 'cancelled' });
+
+      // Après la mise à jour, rafraîchissez la liste des rendez-vous
+      await fetchAppointments();
+
+      // Fermez la modal
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du rendez-vous:", error);
+    }
   };
 
   const filterButtons = [
@@ -147,37 +171,44 @@ function Appointment() {
     const statusColors = getStatusColor(item.status);
 
     return (
-      <View style={styles.appointmentItem}>
-        <View style={styles.leftColumn}>
-          <Image
-            source={require("../../../assets/images/avatar4.jpg")}
-            style={styles.avatar}
-          />
-        </View>
-        <View style={styles.rightColumn}>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Text style={styles.appointmentStatus}>
-              {getAppointmentStatus()}
-            </Text>
-            <View
-              style={[
-                styles.statusBadge,
-                { backgroundColor: statusColors.background },
-              ]}
-            >
-              <Text style={[styles.statusText, { color: statusColors.text }]}>
-                {getTranslatedStatus(item.status)}
-              </Text>
-            </View>
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedAppointment(item);
+          setModalVisible(true);
+        }}
+      >
+        <View style={styles.appointmentItem}>
+          <View style={styles.leftColumn}>
+            <Image
+              source={require("../../../assets/images/avatar4.jpg")}
+              style={styles.avatar}
+            />
           </View>
-          <Text style={styles.appointmentDateTime}>
-            {formattedDate} à {formattedTime}
-          </Text>
-          <Text style={styles.patientName}>{item.patientId.name}</Text>
+          <View style={styles.rightColumn}>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Text style={styles.appointmentStatus}>
+                {getAppointmentStatus()}
+              </Text>
+              <View
+                style={[
+                  styles.statusBadge,
+                  { backgroundColor: statusColors.background },
+                ]}
+              >
+                <Text style={[styles.statusText, { color: statusColors.text }]}>
+                  {getTranslatedStatus(item.status)}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.appointmentDateTime}>
+              {formattedDate} à {formattedTime}
+            </Text>
+            <Text style={styles.patientName}>{item.patientId.name}</Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -198,6 +229,52 @@ function Appointment() {
           }
         />
       )}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeIcon}
+              onPress={() => setModalVisible(false)}
+            >
+              <Icon name="close-outline" fill="#000" style={styles.icon} />
+            </TouchableOpacity>
+            <View style={styles.iconContainer}>
+              <Icon
+                name="calendar-outline"
+                fill="#00BFA6"
+                style={styles.modalIcon}
+              />
+            </View>
+            <Text style={styles.modalText}>Gestion du rendez-vous</Text>
+            <Text style={styles.modalDescription}>
+              Vous pouvez confirmer ou annuler ce rendez-vous. Veuillez choisir
+              l'action appropriée.
+            </Text>
+            <View style={styles.modalButtons}>
+              <Button
+                status="success"
+                size="small"
+                onPress={() => handleAppointmentAction("confirm")}
+              >
+                Confirmer
+              </Button>
+              <Button
+                status="danger"
+                size="small"
+                onPress={() => handleAppointmentAction("cancel")}
+              >
+                Annuler
+              </Button>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -243,7 +320,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     backgroundColor: "#F5F5F5",
     borderRadius: 8,
-    padding: 5,
   },
   leftColumn: {
     width: 80,
@@ -288,6 +364,88 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
     fontSize: 16,
     color: "#003366",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonConfirm: {
+    backgroundColor: "#00BFA6",
+  },
+  buttonCancel: {
+    backgroundColor: "#FF3B30",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+    marginTop: 20,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  closeButton: {
+    marginTop: 20,
+  },
+  modalView: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    position: "relative",
+    width: "80%",
+  },
+  closeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 10,
+    zIndex: 1,
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  iconContainer: {
+    backgroundColor: "rgba(0, 191, 166, 0.1)",
+    borderRadius: 50,
+    padding: 15,
+    marginBottom: 20,
+  },
+  modalIcon: {
+    width: 40,
+    height: 40,
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center",
+    fontFamily: "Poppins-Bold",
+    fontSize: 18,
+  },
+  modalDescription: {
+    fontFamily: "Poppins",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
   },
 });
 
