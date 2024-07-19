@@ -85,15 +85,23 @@ function Appointment() {
     if (!selectedAppointment) return;
 
     try {
-      // Ici, vous devrez implémenter la logique pour confirmer ou annuler le rendez-vous
-      // Par exemple, faire un appel API pour mettre à jour le statut du rendez-vous
-      // await axios.put(`/appointment/${selectedAppointment._id}`, { status: action === 'confirm' ? 'confirmed' : 'cancelled' });
+      let response;
+      if (action === "confirm") {
+        response = await axios.post(
+          `/appointment/complete?id=${selectedAppointment._id}`
+        );
+      } else if (action === "cancel") {
+        response = await axios.post(
+          `/appointment/cancel?id=${selectedAppointment._id}`
+        );
+      }
 
-      // Après la mise à jour, rafraîchissez la liste des rendez-vous
-      await fetchAppointments();
-
-      // Fermez la modal
-      setModalVisible(false);
+      if (response && response.status === 200) {
+        setModalVisible(false);
+        await fetchAppointments();
+      } else {
+        console.error("La mise à jour du rendez-vous a échoué");
+      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du rendez-vous:", error);
     }
