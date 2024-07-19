@@ -169,11 +169,12 @@ const GetDoctorPatients = async (req, res) => {
       return res.status(400).json({ message: "L'ID du docteur est requis" });
     }
 
-    const appointments = await Appointment.find({ doctorId }).populate({
-      path: "patientId",
-      model: "User",
-      select: "name email",
-    });
+    const appointments = await Appointment.find({ doctorId })
+      .populate({
+        path: "patientId",
+        model: "User",
+        select: "name email"
+      });
 
     if (appointments.length === 0) {
       return res.status(404).json({
@@ -182,10 +183,7 @@ const GetDoctorPatients = async (req, res) => {
     }
 
     const uniquePatients = appointments.reduce((acc, appointment) => {
-      const patientExists = acc.find(
-        (patient) =>
-          patient._id.toString() === appointment.patientId._id.toString()
-      );
+      const patientExists = acc.find(patient => patient._id.toString() === appointment.patientId._id.toString());
       if (!patientExists) {
         acc.push(appointment.patientId);
       }
