@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, FlatList, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  Image,
+  RefreshControl,
+} from "react-native";
 import axios from "../../../api/axios";
 import { Input, Icon } from "@ui-kitten/components";
 import io, { Socket } from "socket.io-client";
@@ -13,43 +20,49 @@ interface Patient {
     _id: string;
     name: string;
     email: string;
-    role: string;
-    phone: string;
-    emailVerified: boolean;
-    phoneVerified: boolean;
-    createdAt: string;
-    updatedAt: string;
   };
   dateOfBirth: string;
   gender: string;
   address: string;
-  createdAt: string;
-  updatedAt: string;
+}
+
+interface User {
+  _id: string;
 }
 
 function Message({ navigation }: any) {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const userData = await AsyncStorage.getItem("user");
-        if (userData) {
-          const user = JSON.parse(userData);
-          setUserId(user._id);
-        }
-      } catch (error) {
-        console.error("Erreur lors de la récupération de l'userId:", error);
+  const fetchData = useCallback(async () => {
+    try {
+      const userString = await AsyncStorage.getItem("user");
+      if (!userString) {
+        throw new Error("User data not found");
       }
-    };
 
-    fetchUserId();
-    fetchPatients();
+      const user: User = JSON.parse(userString);
+      setUserId(user._id);
+
+      const response = await axios.get(`/doctor/patients?doctorId=${user._id}`);
+      setPatients(response.data.patients);
+      setError("");
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données:", error);
+      setError("Erreur lors du chargement des données");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
     return () => {
@@ -57,18 +70,12 @@ function Message({ navigation }: any) {
         newSocket.disconnect();
       }
     };
-  }, []);
+  }, [fetchData]);
 
-  const fetchPatients = async () => {
-    try {
-      const response = await axios.get<{ patients: Patient[] }>("/patients");
-      setPatients(response.data.patients);
-      setLoading(false);
-    } catch (err) {
-      setError("Une erreur est survenue lors du chargement des patients");
-      setLoading(false);
-    }
-  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchData();
+  }, [fetchData]);
 
   const handlePatientPress = (patient: Patient) => {
     if (socket && userId) {
@@ -124,11 +131,25 @@ function Message({ navigation }: any) {
           style={styles.searchInput}
         />
       </View>
-      <FlatList
-        data={patients}
-        renderItem={renderPatientItem}
-        keyExtractor={(item) => item._id._id}
-      />
+      {error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        <FlatList
+          data={patients}
+          renderItem={renderPatientItem}
+          keyExtractor={(item) => item._id._id}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#003366"]}
+            />
+          }
+          ListEmptyComponent={
+            <Text style={styles.noPatients}>Aucun patient trouvé.</Text>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -176,6 +197,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderColor: "#f0f0f0",
     borderRadius: 5,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontFamily: "Poppins",
+    fontSize: 16,
+  },
+  errorText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontFamily: "Poppins",
+    fontSize: 16,
+    color: "red",
+  },
+  noPatients: {
+    textAlign: "center",
+    marginTop: 20,
+    fontFamily: "Poppins",
+    fontSize: 16,
+    color: "#666",
   },
 });
 
