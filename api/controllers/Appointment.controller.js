@@ -212,11 +212,57 @@ const GetDoctorPatients = async (req, res) => {
   }
 };
 
+const GetDoctorAppointmentStats = async (req, res) => {
+  const { doctorId } = req.query;
+
+  try {
+    if (!doctorId) {
+      return res.status(400).json({ message: "L'ID du docteur est requis" });
+    }
+
+    const appointments = await Appointment.find({ doctorId });
+
+    if (appointments.length === 0) {
+      return res.status(404).json({
+        message: "Aucun rendez-vous trouvé pour ce docteur",
+      });
+    }
+
+    const totalAppointments = appointments.length;
+    const stats = {
+      pending: { count: 0, percentage: 0 },
+      cancelled: { count: 0, percentage: 0 },
+      completed: { count: 0, percentage: 0 },
+    };
+
+    appointments.forEach(appointment => {
+      stats[appointment.status].count++;
+    });
+
+    for (let status in stats) {
+      stats[status].percentage = (stats[status].count / totalAppointments * 100).toFixed(2);
+    }
+
+    res.status(200).json({
+      message: "Statistiques des rendez-vous récupérées avec succès",
+      totalAppointments,
+      stats,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des statistiques:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des statistiques",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   AddAppointment,
   CanceleAppointment,
   CompleteAppointment,
   GetAppointmentByPatient,
   GetAppointmentByDoctor,
-  GetDoctorPatients
+  GetDoctorPatients,
+  GetDoctorAppointmentStats
 };

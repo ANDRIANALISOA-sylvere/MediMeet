@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import { Layout, Card, Text, Icon } from "@ui-kitten/components";
+import AppointmentStats from "./AppointmentStats";
 
 const PersonIcon = (props: any) => <Icon {...props} name="person-outline" />;
 const StarIcon = (props: any) => <Icon {...props} name="star-outline" />;
@@ -59,6 +60,7 @@ function Home() {
           </View>
         </Card>
       </View>
+      <AppointmentStats></AppointmentStats>
     </View>
   );
 }
