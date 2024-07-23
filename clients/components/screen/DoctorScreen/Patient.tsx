@@ -5,8 +5,9 @@ import {
   StyleSheet,
   RefreshControl,
   TouchableOpacity,
+  Image,
 } from "react-native";
-import { Text, List, Spinner } from "@ui-kitten/components";
+import { Text, List, Spinner, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 
@@ -67,23 +68,39 @@ const Patient: React.FC = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const renderPatientItem = ({ item }: { item: Patient }) => (
-    <View style={styles.itemContainer}>
-      <TouchableOpacity onPress={() => toggleExpand(item._id._id)}>
-        <Text style={styles.nameText}>{item._id.name}</Text>
-      </TouchableOpacity>
-      {expandedId === item._id._id && (
-        <View style={styles.expandedContent}>
-          <Text style={styles.infoText}>Email: {item._id.email}</Text>
-          <Text style={styles.infoText}>
-            Date de naissance: {new Date(item.dateOfBirth).toLocaleDateString()}
-          </Text>
-          <Text style={styles.infoText}>Genre: {item.gender}</Text>
-          <Text style={styles.infoText}>Adresse: {item.address}</Text>
-        </View>
-      )}
-    </View>
-  );
+  const renderPatientItem = ({ item }: { item: Patient }) => {
+    const isExpanded = expandedId === item._id._id;
+    return (
+      <View style={styles.itemContainer}>
+        <TouchableOpacity
+          onPress={() => toggleExpand(item._id._id)}
+          style={styles.headerContainer}
+        >
+          <Image
+            source={require("../../../assets/images/avatar4.jpg")}
+            style={styles.avatar}
+          />
+          <Text style={styles.nameText}>{item._id.name}</Text>
+          <Icon
+            name={isExpanded ? "arrow-up" : "arrow-down"}
+            fill="#BDBDBD"
+            style={styles.icon}
+          />
+        </TouchableOpacity>
+        {isExpanded && (
+          <View style={styles.expandedContent}>
+            <Text style={styles.infoText}>Email: {item._id.email}</Text>
+            <Text style={styles.infoText}>
+              Date de naissance:{" "}
+              {new Date(item.dateOfBirth).toLocaleDateString()}
+            </Text>
+            <Text style={styles.infoText}>Genre: {item.gender}</Text>
+            <Text style={styles.infoText}>Adresse: {item.address}</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -118,6 +135,7 @@ const Patient: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f0f0f0",
   },
   centerContainer: {
     flex: 1,
@@ -125,23 +143,49 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   itemContainer: {
+    marginHorizontal: 16,
+    marginVertical: 8,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    shadowColor: "#BDBDBD",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.01,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
   },
   nameText: {
     fontFamily: "Poppins-Bold",
     fontSize: 16,
     textTransform: "capitalize",
+    flex: 1,
   },
   expandedContent: {
-    marginTop: 8,
-    backgroundColor: "#fff",
+    padding: 16,
+    backgroundColor: "#f9f9f9",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
   },
   infoText: {
     fontFamily: "Poppins",
-    marginBottom: 4,
-    padding: 10,
+    marginBottom: 8,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 16,
+  },
+  icon: {
+    width: 24,
+    height: 24,
   },
 });
 
