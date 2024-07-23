@@ -163,7 +163,6 @@ const GetAppointmentByDoctor = async (req, res) => {
 
 const GetDoctorPatients = async (req, res) => {
   const { doctorId } = req.query;
-  console.log(doctorId);
 
   try {
     if (!doctorId) {

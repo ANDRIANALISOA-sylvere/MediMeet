@@ -1,5 +1,6 @@
 const Doctor = require("../models/Doctor.model");
 const ReviewModel = require("../models/Review.model");
+const mongoose = require("mongoose")
 
 const addDoctor = async (req, res) => {
   const { _id, specialty, experience, price, about, location, availability } =
@@ -45,16 +46,64 @@ const getDoctorById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const doctor = await Doctor.findById(id).populate("_id");
+    const doctorWithRatings = await Doctor.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "doctorId",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: { $avg: "$reviews.rating" },
+          reviewCount: { $size: "$reviews" },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: "$userInfo.name",
+          specialty: 1,
+          experience: 1,
+          price: 1,
+          about: 1,
+          location: 1,
+          availability: 1,
+          averageRating: 1,
+          reviewCount: 1,
+        },
+      },
+    ]);
 
-    if (!doctor) {
-      return res.status(404).json("Doctor not found");
+    if (doctorWithRatings.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Doctor not found" });
     }
 
-    res.status(200).json({ doctor });
+    res.status(200).json({
+      success: true,
+      data: doctorWithRatings[0],
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error fetching doctor");
+    res.status(500).json({
+      success: false,
+      message: "Error fetching doctor",
+      error: error.message,
+    });
   }
 };
 
