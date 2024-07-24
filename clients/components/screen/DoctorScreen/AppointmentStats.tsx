@@ -16,34 +16,44 @@ const statusTranslations: { [key in AppointmentStatus]: string } = {
   completed: "Terminés",
 };
 
-const AppointmentStats = () => {
+interface AppointmentStatsProps {
+  refreshing: boolean;
+}
+
+const AppointmentStats: React.FC<AppointmentStatsProps> = ({ refreshing }) => {
   const [stats, setStats] = useState<StatsType>({
     pending: { count: 0, percentage: "0" },
     cancelled: { count: 0, percentage: "0" },
     completed: { count: 0, percentage: "0" },
   });
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const userString = await AsyncStorage.getItem("user");
-        if (!userString) {
-          throw new Error("User data not found");
-        }
-        const user = JSON.parse(userString);
-        const doctorId = user._id;
-
-        const response = await axios.get(
-          `/appointments/stats?doctorId=${doctorId}`
-        );
-        setStats(response.data.stats);
-      } catch (error) {
-        console.error("Failed to fetch appointment stats:", error);
+  const fetchStats = async () => {
+    try {
+      const userString = await AsyncStorage.getItem("user");
+      if (!userString) {
+        throw new Error("User data not found");
       }
-    };
+      const user = JSON.parse(userString);
+      const doctorId = user._id;
 
+      const response = await axios.get(
+        `/appointments/stats?doctorId=${doctorId}`
+      );
+      setStats(response.data.stats);
+    } catch (error) {
+      console.error("Failed to fetch appointment stats:", error);
+    }
+  };
+
+  useEffect(() => {
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    if (refreshing) {
+      fetchStats();
+    }
+  }, [refreshing]);
 
   const renderProgressBar = (status: AppointmentStatus, color: string) => (
     <View style={styles.card}>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import { Layout, Card, Text, Icon } from "@ui-kitten/components";
@@ -12,37 +12,48 @@ function Home() {
   const [patientCount, setPatientCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDoctorData = async () => {
+    try {
+      const userString = await AsyncStorage.getItem("user");
+      if (!userString) {
+        throw new Error("User data not found");
+      }
+
+      const user = JSON.parse(userString);
+      const doctorId = user._id;
+
+      const patientResponse = await axios.get(
+        `/doctor/patients?doctorId=${doctorId}`
+      );
+      setPatientCount(patientResponse.data.count);
+
+      const doctorResponse = await axios.get(`/doctor/${doctorId}`);
+      const { averageRating, reviewCount } = doctorResponse.data.data;
+      setAverageRating(averageRating || 0);
+      setReviewCount(reviewCount || 0);
+    } catch (error) {
+      console.error("Failed to fetch doctor data:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchDoctorData = async () => {
-      try {
-        const userString = await AsyncStorage.getItem("user");
-        if (!userString) {
-          throw new Error("User data not found");
-        }
-
-        const user = JSON.parse(userString);
-        const doctorId = user._id;
-
-        const patientResponse = await axios.get(
-          `/doctor/patients?doctorId=${doctorId}`
-        );
-        setPatientCount(patientResponse.data.count);
-
-        const doctorResponse = await axios.get(`/doctor/${doctorId}`);
-        const { averageRating, reviewCount } = doctorResponse.data.data;
-        setAverageRating(averageRating || 0);
-        setReviewCount(reviewCount || 0);
-      } catch (error) {
-        console.error("Failed to fetch doctor data:", error);
-      }
-    };
-
     fetchDoctorData();
   }, []);
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDoctorData().then(() => setRefreshing(false));
+  }, []);
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.row}>
         <Card style={[styles.card, styles.blueCard]}>
           <PersonIcon style={styles.icon} fill="#3366FF" />
@@ -60,14 +71,14 @@ function Home() {
           </View>
         </Card>
       </View>
-      <AppointmentStats></AppointmentStats>
-    </View>
+      <AppointmentStats refreshing={refreshing} />
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     padding: 16,
     backgroundColor: "#fff",
   },
