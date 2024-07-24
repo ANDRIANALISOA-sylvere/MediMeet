@@ -1,6 +1,6 @@
 const Doctor = require("../models/Doctor.model");
 const ReviewModel = require("../models/Review.model");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const addDoctor = async (req, res) => {
   const { _id, specialty, experience, price, about, location, availability } =
@@ -33,12 +33,68 @@ const addDoctor = async (req, res) => {
 
 const getDoctors = async (req, res) => {
   try {
-    const doctors = await Doctor.find().populate("_id");
+    const { name, specialty } = req.query;
 
-    res.status(200).json({ doctors });
+    let query = Doctor.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "doctorId",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: { $avg: "$reviews.rating" },
+          reviewCount: { $size: "$reviews" },
+        },
+      },
+    ]);
+
+    if (name) {
+      query.match({ "userInfo.name": { $regex: name, $options: "i" } });
+    }
+
+    if (specialty) {
+      query.match({ specialty: specialty });
+    }
+
+    query.project({
+      _id: 1,
+      name: "$userInfo.name",
+      specialty: 1,
+      experience: 1,
+      price: 1,
+      about: 1,
+      location: 1,
+      availability: 1,
+      averageRating: 1,
+      reviewCount: 1,
+    });
+
+    const doctors = await query.exec();
+
+    res.status(200).json({
+      success: true,
+      data: doctors,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error fetching doctors");
+    res.status(500).json({
+      success: false,
+      message: "Error fetching doctors",
+      error: error.message,
+    });
   }
 };
 
@@ -226,6 +282,48 @@ const getPopularDoctors = async (req, res) => {
   }
 };
 
+const getUniqueSpecialties = async (req, res) => {
+  try {
+    const specialties = await Doctor.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "userInfo",
+        },
+      },
+      { $unwind: "$userInfo" },
+      {
+        $group: {
+          _id: "$specialty",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          specialty: "$_id",
+          count: 1,
+        },
+      },
+      { $sort: { specialty: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: specialties,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching specialties",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   addDoctor,
   getDoctors,
@@ -234,4 +332,5 @@ module.exports = {
   getDoctorAvailability,
   addDoctorAvailability,
   getPopularDoctors,
+  getUniqueSpecialties,
 };

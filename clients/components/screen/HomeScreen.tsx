@@ -50,6 +50,10 @@ function HomeScreen({ navigation }: any) {
     navigation.navigate("DoctorDetails", { doctor });
   };
 
+  const handleSearchPress = () => {
+    navigation.navigate("SearchDoctor");
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -64,7 +68,9 @@ function HomeScreen({ navigation }: any) {
           </View>
         </View>
         <View style={{ flexDirection: "row", gap: 10 }}>
-          <Icon name="search-outline" style={styles.icon} fill="#000" />
+          <TouchableOpacity onPress={handleSearchPress}>
+            <Icon name="search-outline" style={styles.icon} fill="#000" />
+          </TouchableOpacity>
           <Icon name="bell-outline" style={styles.icon} fill="#000" />
         </View>
       </View>

@@ -16,6 +16,7 @@ import NotificationScreen from "../screen/NotificationScreen";
 import AccountScreen from "../screen/AccountScreen";
 import DoctorDetails from "../screen/DoctorDetails";
 import ChatDetailsScreen from "../screen/DoctorScreen/ChatDetailsScreen";
+import SearchDoctor from "../screen/SearchDoctor";
 
 function HomeStack() {
   return (
@@ -193,6 +194,18 @@ function MainNavigation() {
         options={{
           headerShown: true,
           title: "Messages",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="SearchDoctor"
+        component={SearchDoctor}
+        options={{
+          headerShown: true,
+          title: "Chercher un médecin",
           headerTitleStyle: {
             fontFamily: "Poppins-Bold",
             color: "#003366",
