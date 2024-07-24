@@ -8,29 +8,32 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
 
+interface Availability {
+  day: string;
+  startTime: string;
+}
+
 interface Doctor {
   _id: {
     _id: string;
     name: string;
     email: string;
-    role: string;
-    phone: string;
-    emailVerified: boolean;
-    phoneVerified: boolean;
-    createdAt: string;
-    updatedAt: string;
   };
   specialty: string;
   experience: number;
   price: number;
   about: string;
   location: string;
-  availability: Array<{
-    day: string;
-    startTime: string;
-  }>;
+  availability: Availability[];
   createdAt: string;
   updatedAt: string;
+  __v: number;
+}
+
+interface GetDoctorsResponse {
+  message: string;
+  count: number;
+  doctors: Doctor[];
 }
 
 function ChatScreen({ navigation }: any) {
@@ -55,9 +58,10 @@ function ChatScreen({ navigation }: any) {
     };
 
     fetchUserId();
-    fetchDoctors();
+
     const newSocket = io(SOCKET_URL);
     setSocket(newSocket);
+
     return () => {
       if (newSocket) {
         newSocket.disconnect();
@@ -65,9 +69,17 @@ function ChatScreen({ navigation }: any) {
     };
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      fetchDoctors();
+    }
+  }, [userId]);
+
   const fetchDoctors = async () => {
     try {
-      const response = await axios.get<{ doctors: Doctor[] }>("/doctors");
+      const response = await axios.get<{ doctors: Doctor[] }>(
+        `/patient/doctors?patientId=${userId}`
+      );
       setDoctors(response.data.doctors);
       setLoading(false);
     } catch (err) {

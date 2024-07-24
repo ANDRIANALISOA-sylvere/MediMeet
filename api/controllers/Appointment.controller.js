@@ -161,6 +161,58 @@ const GetAppointmentByDoctor = async (req, res) => {
   }
 };
 
+const GetPatientDoctors = async (req, res) => {
+  const { patientId } = req.query;
+
+  try {
+    if (!patientId) {
+      return res.status(400).json({ message: "L'ID du patient est requis" });
+    }
+
+    const appointments = await Appointment.find({ 
+      patientId: patientId,
+      status: "completed"
+    }).populate({
+      path: "doctorId",
+      model: "Doctor",
+      populate: {
+        path: "_id",
+        model: "User",
+        select: "name email"
+      }
+    });
+
+    if (appointments.length === 0) {
+      return res.status(404).json({
+        message: "Aucun docteur avec rendez-vous complété trouvé pour ce patient",
+      });
+    }
+
+    const uniqueDoctors = appointments.reduce((acc, appointment) => {
+      const doctorExists = acc.find(doctor => 
+        doctor._id._id.toString() === appointment.doctorId._id._id.toString()
+      );
+      if (!doctorExists) {
+        acc.push(appointment.doctorId);
+      }
+      return acc;
+    }, []);
+
+    res.status(200).json({
+      message: "Liste des docteurs avec rendez-vous complétés récupérée avec succès",
+      count: uniqueDoctors.length,
+      doctors: uniqueDoctors,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des docteurs:", error);
+    res.status(500).json({
+      message: "Erreur lors de la récupération des docteurs",
+      error: error.message,
+    });
+  }
+};
+
+
 const GetDoctorPatients = async (req, res) => {
   const { doctorId } = req.query;
 
@@ -264,5 +316,6 @@ module.exports = {
   GetAppointmentByPatient,
   GetAppointmentByDoctor,
   GetDoctorPatients,
-  GetDoctorAppointmentStats
+  GetDoctorAppointmentStats,
+  GetPatientDoctors
 };

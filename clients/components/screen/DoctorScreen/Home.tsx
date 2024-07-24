@@ -125,7 +125,7 @@ function Home() {
         </Card>
       </View>
       <AppointmentStats refreshing={refreshing} />
-      <View style={styles.chartCard}>
+      {/* <View style={styles.chartCard}>
         <Text style={styles.chartTitle}>Patients par mois</Text>
         <LineChart
           data={data}
@@ -135,7 +135,7 @@ function Home() {
           bezier
           style={styles.chart}
         />
-      </View>
+      </View> */}
     </ScrollView>
   );
 }
