@@ -4,35 +4,90 @@ const addReview = async (req, res) => {
   const { doctorId, patientId, rating, comment } = req.body;
 
   try {
-    const review = new Review({
+    let review = new Review({
       doctorId,
       patientId,
       rating,
       comment,
     });
 
-    await review.save();
+    review = await review.save();
 
-    res.status(201).json({ review });
+    review = await Review.findById(review._id)
+      .populate("doctorId")
+      .populate({
+        path: "patientId",
+        populate: {
+          path: "_id",
+          model: "User",
+          select: "name",
+        },
+      })
+      .exec();
+
+    const restructuredReview = {
+      ...review.toObject(),
+      patientId: {
+        _id: review.patientId._id._id,
+        name: review.patientId._id.name,
+        ...review.patientId.toObject(),
+      },
+    };
+
+    delete restructuredReview.patientId._id;
+
+    res.status(201).json({ success: true, data: restructuredReview });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error adding review");
+    res.status(500).json({
+      success: false,
+      message: "Error adding review",
+      error: error.message,
+    });
   }
 };
 
 const getReviews = async (req, res) => {
   try {
-    const reviews = await Review.find()
-      .populate("doctorId", "specialty experience")
-      .populate("patientId", "personalInfo");
+    const { doctorId } = req.query;
+    let query = {};
 
-    res.status(200).json({ reviews });
+    if (doctorId) {
+      query.doctorId = doctorId;
+    }
+
+    let reviews = await Review.find(query)
+      .populate("doctorId")
+      .populate({
+        path: "patientId",
+        model: "User",
+        select: "name",
+      })
+      .lean();
+
+    reviews = reviews.map((review) => {
+      if (review.patientId) {
+        return {
+          ...review,
+          patientId: {
+            _id: review.patientId._id,
+            name: review.patientId.name,
+          },
+        };
+      }
+      return review;
+    });
+
+    res.status(200).json({ success: true, data: reviews });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error fetching reviews");
+    res.status(500).json({
+      success: false,
+      message: "Error fetching reviews",
+      error: error.message,
+    });
   }
 };
-
 const getReviewById = async (req, res) => {
   const { id } = req.params;
 
@@ -91,33 +146,10 @@ const deleteReview = async (req, res) => {
   }
 };
 
-const getReviewsByDoctor = async (req, res) => {
-  const { doctorId } = req.params;
-
-  try {
-    const reviews = await Review.find({ doctorId })
-      .populate("doctorId", "specialty experience")
-      .populate("patientId", "personalInfo");
-
-    if (!reviews || reviews.length === 0) {
-      return res.status(404).json("No reviews found for this doctor");
-    }
-
-    const averageRating =
-      reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
-
-    res.status(200).json({ reviews, averageRating });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json("Error fetching reviews");
-  }
-};
-
 module.exports = {
   addReview,
   getReviews,
-  getReviewById,
   updateReview,
   deleteReview,
-  getReviewsByDoctor,
+  getReviewById
 };

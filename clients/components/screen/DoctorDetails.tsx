@@ -4,9 +4,8 @@ import {
   Text,
   StyleSheet,
   Image,
-  FlatList,
-  ScrollView,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { Icon, Button } from "@ui-kitten/components";
 import {
@@ -18,6 +17,7 @@ import {
 } from "date-fns";
 import axios from "../../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import ReviewList from "./ReviewList";
 
 function DoctorDetails({ route }: any) {
   const { doctor } = route.params;
@@ -25,9 +25,11 @@ function DoctorDetails({ route }: any) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     updateAvailableDates(selectedMonth);
+    fetchReviews();
   }, [selectedMonth]);
 
   const updateAvailableDates = (month: Date) => {
@@ -45,6 +47,15 @@ function DoctorDetails({ route }: any) {
       .map((date) => format(date, "yyyy/MM/dd"));
 
     setAvailableDates(availableDatesInMonth);
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await axios.get(`/reviews?doctorId=${doctor._id}`);
+      setReviews(response.data.data);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
   };
 
   const handleMonthChange = (increment: number) => {
@@ -108,8 +119,8 @@ function DoctorDetails({ route }: any) {
     }
   };
 
-  return (
-    <ScrollView style={styles.container}>
+  const renderHeader = () => (
+    <>
       <View style={styles.header}>
         <Image
           source={require("../../assets/images/avatar4.jpg")}
@@ -245,13 +256,24 @@ function DoctorDetails({ route }: any) {
       >
         Prendre un rendez-vous
       </Button>
-    </ScrollView>
+
+      <Text style={styles.sectionTitle}>Avis des patients</Text>
+    </>
+  );
+
+  return (
+    <FlatList
+      ListHeaderComponent={renderHeader}
+      data={reviews}
+      renderItem={({ item }) => <ReviewList review={item} />}
+      keyExtractor={(item: any) => item._id}
+      contentContainerStyle={styles.container}
+    />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: "#fff",
   },
