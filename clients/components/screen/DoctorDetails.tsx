@@ -70,7 +70,7 @@ function DoctorDetails({ route }: any) {
       showToast(
         "error",
         "Erreur",
-        "Veuillez donner une note et écrire un commentaire."
+        "Veuillez donner une note et écrire un commentaire " + " ❌"
       );
       return;
     }
@@ -96,7 +96,7 @@ function DoctorDetails({ route }: any) {
         showToast(
           "success",
           "Succès",
-          "L'avis a été ajouté avec succès" + " 👋"
+          "L'avis a été ajouté avec succès" + " 💯"
         );
         setNewRating(0);
         setNewComment("");
@@ -105,7 +105,7 @@ function DoctorDetails({ route }: any) {
         showToast(
           "error",
           "Erreur",
-          "Impossible d'ajouter votre avis. Veuillez réessayer."
+          "Impossible d'ajouter votre avis. Veuillez réessayer " + " ❌"
         );
       }
     } catch (error) {
@@ -201,7 +201,7 @@ function DoctorDetails({ route }: any) {
       showToast(
         "success",
         "Succès",
-        "Le rendez-vous a été envoyé avec succès" + " 👋"
+        "Le rendez-vous a été envoyé avec succès" + " 💯"
       );
       setSelectedDate(null);
       console.log("Rendez-vous envoyé avec succès:", result);

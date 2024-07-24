@@ -1,5 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, FlatList, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  Image,
+  RefreshControl,
+} from "react-native";
 import axios from "../../api/axios";
 import { Input, Icon } from "@ui-kitten/components";
 import io, { Socket } from "socket.io-client";
@@ -39,6 +46,7 @@ interface GetDoctorsResponse {
 function ChatScreen({ navigation }: any) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -81,12 +89,19 @@ function ChatScreen({ navigation }: any) {
         `/patient/doctors?patientId=${userId}`
       );
       setDoctors(response.data.doctors);
-      setLoading(false);
+      setError("");
     } catch (err) {
       setError("Une erreur est survenue lors du chargement des docteurs");
+    } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDoctors();
+  }, [userId]);
 
   const handleDoctorPress = (doctor: any) => {
     if (socket && userId) {
@@ -144,6 +159,16 @@ function ChatScreen({ navigation }: any) {
         data={doctors}
         renderItem={renderDoctorItem}
         keyExtractor={(item) => item._id._id}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#003366"]}
+          />
+        }
+        ListEmptyComponent={
+          <Text style={styles.noDoctors}>Aucun docteur trouvé.</Text>
+        }
       />
     </View>
   );
@@ -186,9 +211,12 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
     color: "#003366",
   },
-  doctorLocation: {
-    fontSize: 12,
-    color: "#999",
+  noDoctors: {
+    textAlign: "center",
+    marginTop: 20,
+    fontFamily: "Poppins",
+    fontSize: 16,
+    color: "#666",
   },
   searchInput: {
     marginTop: 10,
