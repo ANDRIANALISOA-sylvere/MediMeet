@@ -20,6 +20,7 @@ import {
 import axios from "../../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReviewList from "./ReviewList";
+import Toast from "react-native-toast-message";
 
 const CommentInput = ({ value, onChangeText }: any) => {
   const [localComment, setLocalComment] = useState(value);
@@ -51,9 +52,23 @@ function DoctorDetails({ route }: any) {
     fetchReviews();
   }, [selectedMonth]);
 
+  const showToast = (type: any, text1: any, text2: any) => {
+    Toast.show({
+      type: type,
+      position: "top",
+      text1: text1,
+      text2: text2,
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 30,
+      bottomOffset: 40,
+    });
+  };
+
   const handleAddReview = async () => {
     if (newRating === 0 || newComment.trim() === "") {
-      Alert.alert(
+      showToast(
+        "error",
         "Erreur",
         "Veuillez donner une note et écrire un commentaire."
       );
@@ -78,12 +93,17 @@ function DoctorDetails({ route }: any) {
       });
 
       if (response.data.success) {
-        Alert.alert("Succès", "Votre avis a été ajouté avec succès.");
+        showToast(
+          "success",
+          "Succès",
+          "L'avis a été ajouté avec succès" + " 👋"
+        );
         setNewRating(0);
         setNewComment("");
         fetchReviews();
       } else {
-        Alert.alert(
+        showToast(
+          "error",
           "Erreur",
           "Impossible d'ajouter votre avis. Veuillez réessayer."
         );
@@ -178,6 +198,12 @@ function DoctorDetails({ route }: any) {
     try {
       const response = await axios.post("/appointment", appointmentData);
       const result = await response.data;
+      showToast(
+        "success",
+        "Succès",
+        "Le rendez-vous a été envoyé avec succès" + " 👋"
+      );
+      setSelectedDate(null);
       console.log("Rendez-vous envoyé avec succès:", result);
     } catch (error) {
       console.error("Erreur lors de l'envoi du rendez-vous:", error);
@@ -348,14 +374,17 @@ function DoctorDetails({ route }: any) {
   );
 
   return (
-    <FlatList
-      ListHeaderComponent={renderHeader}
-      data={reviews}
-      renderItem={({ item }) => <ReviewList review={item} />}
-      keyExtractor={(item: any) => item._id}
-      contentContainerStyle={styles.container}
-      ListFooterComponent={renderFooter}
-    />
+    <>
+      <FlatList
+        ListHeaderComponent={renderHeader}
+        data={reviews}
+        renderItem={({ item }) => <ReviewList review={item} />}
+        keyExtractor={(item: any) => item._id}
+        contentContainerStyle={styles.container}
+        ListFooterComponent={renderFooter}
+      />
+      <Toast />
+    </>
   );
 }
 
