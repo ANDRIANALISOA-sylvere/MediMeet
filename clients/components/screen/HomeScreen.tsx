@@ -85,6 +85,7 @@ function HomeScreen({ navigation }: any) {
             accessoryLeft={(props) => <Icon {...props} name="search" />}
             status="basic"
             size="small"
+            onPress={handleSearchPress}
           >
             <Text style={styles.buttonText}>chercher maintenat ...</Text>
           </Button>

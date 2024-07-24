@@ -39,6 +39,7 @@ function SearchDoctor({ navigation }: any) {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSpecialty, setSelectedSpecialty] = useState("");
+  const [isFocused, setIsFocused] = useState(false);
 
   const fetchDoctors = async () => {
     try {
@@ -88,6 +89,9 @@ function SearchDoctor({ navigation }: any) {
         onChangeText={setSearchTerm}
         accessoryLeft={searchIcon}
         style={styles.searchInput}
+        status={isFocused ? "success" : "basic"}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
       />
       <FlatList
         horizontal
@@ -237,17 +241,13 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins",
   },
   searchInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
     margin: 10,
-    paddingHorizontal: 10,
     borderRadius: 5,
   },
   specialtyList: {
     marginBottom: 10,
     maxHeight: 40,
-    marginLeft: 15,
+    marginLeft: 5,
   },
   specialtyBadge: {
     borderColor: "#00BFA6",
