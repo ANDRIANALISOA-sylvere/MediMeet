@@ -1,9 +1,16 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  Dimensions,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import { Layout, Card, Text, Icon } from "@ui-kitten/components";
 import AppointmentStats from "./AppointmentStats";
+import { LineChart } from "react-native-chart-kit";
 
 const PersonIcon = (props: any) => <Icon {...props} name="person-outline" />;
 const StarIcon = (props: any) => <Icon {...props} name="star-outline" />;
@@ -13,6 +20,7 @@ function Home() {
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [patientData, setPatientData] = useState([0, 0, 0]);
 
   const fetchDoctorData = async () => {
     try {
@@ -28,6 +36,25 @@ function Home() {
         `/doctor/patients?doctorId=${doctorId}`
       );
       setPatientCount(patientResponse.data.count);
+
+      const patients = patientResponse.data.patients;
+      const now = new Date();
+      const threeMonthsAgo = new Date(now.setMonth(now.getMonth() - 3));
+      const twoMonthsAgo = new Date(now.setMonth(now.getMonth() + 1));
+      const oneMonthAgo = new Date(now.setMonth(now.getMonth() + 1));
+
+      const patientCounts = [0, 0, 0];
+      patients.forEach((patient: any) => {
+        const createdAt = new Date(patient.createdAt);
+        if (createdAt >= twoMonthsAgo && createdAt < oneMonthAgo) {
+          patientCounts[0]++;
+        } else if (createdAt >= oneMonthAgo && createdAt < now) {
+          patientCounts[1]++;
+        } else if (createdAt >= now) {
+          patientCounts[2]++;
+        }
+      });
+      setPatientData(patientCounts);
 
       const doctorResponse = await axios.get(`/doctor/${doctorId}`);
       const { averageRating, reviewCount } = doctorResponse.data.data;
@@ -46,6 +73,24 @@ function Home() {
     setRefreshing(true);
     fetchDoctorData().then(() => setRefreshing(false));
   }, []);
+
+  const chartConfig = {
+    backgroundGradientFrom: "#fff",
+    backgroundGradientTo: "#fff",
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    strokeWidth: 2,
+  };
+
+  const data = {
+    labels: ["Il y a 2 mois", "Le mois dernier", "Ce mois-ci"],
+    datasets: [
+      {
+        data: patientData,
+        color: (opacity = 1) => `rgba(51, 102, 255, ${opacity})`,
+        strokeWidth: 2,
+      },
+    ],
+  };
 
   return (
     <ScrollView
@@ -71,7 +116,18 @@ function Home() {
           </View>
         </Card>
       </View>
-      <AppointmentStats refreshing={refreshing} />
+      <View style={styles.chartCard}>
+        <Text style={styles.chartTitle}>Nouveaux patients par mois</Text>
+        <LineChart
+          data={data}
+          width={Dimensions.get("window").width - 50}
+          height={220}
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chart}
+        />
+        <AppointmentStats refreshing={refreshing} />
+      </View>
     </ScrollView>
   );
 }
@@ -111,6 +167,19 @@ const styles = StyleSheet.create({
   cardValue: {
     fontFamily: "Poppins-Bold",
     fontSize: 30,
+  },
+  chartCard: {
+    marginTop: 16,
+    padding: 16,
+  },
+  chartTitle: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 18,
+    marginBottom: 8,
+  },
+  chart: {
+    marginVertical: 8,
+    borderRadius: 16,
   },
 });
 
