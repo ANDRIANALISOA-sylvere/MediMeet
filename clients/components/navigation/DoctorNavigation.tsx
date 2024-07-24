@@ -15,6 +15,7 @@ import AppointmentsScreen from "../screen/DoctorScreen/Appointment";
 import PatientsScreen from "../screen/DoctorScreen/Patient";
 import AccountScreen from "../screen/DoctorScreen/Account";
 import MessageDetails from "../screen/DoctorScreen/MessageDetails";
+import ProfileDoctor from "../screen/DoctorScreen/ProfileDoctor";
 
 function DoctorNavigation() {
   return (
@@ -166,6 +167,18 @@ function DoctorMainNavigation() {
         options={{
           headerShown: true,
           title: "Messages",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="ProfileDoctor"
+        component={ProfileDoctor}
+        options={{
+          headerShown: true,
+          title: "Profile",
           headerTitleStyle: {
             fontFamily: "Poppins-Bold",
             color: "#003366",

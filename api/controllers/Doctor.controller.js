@@ -3,8 +3,10 @@ const ReviewModel = require("../models/Review.model");
 const mongoose = require("mongoose");
 
 const addDoctor = async (req, res) => {
-  const { _id, specialty, experience, price, about, location, availability } =
+  const { _id, specialty, experience, price, about, location } =
     req.body;
+
+    console.log(req.body)
 
   try {
     const doctor = new Doctor({
@@ -14,7 +16,6 @@ const addDoctor = async (req, res) => {
       price,
       about,
       location,
-      availability,
     });
 
     await doctor.save();

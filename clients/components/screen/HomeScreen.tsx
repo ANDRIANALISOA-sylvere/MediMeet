@@ -71,7 +71,6 @@ function HomeScreen({ navigation }: any) {
           <TouchableOpacity onPress={handleSearchPress}>
             <Icon name="search-outline" style={styles.icon} fill="#000" />
           </TouchableOpacity>
-          <Icon name="bell-outline" style={styles.icon} fill="#000" />
         </View>
       </View>
 
