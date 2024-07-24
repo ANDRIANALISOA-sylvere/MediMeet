@@ -77,8 +77,16 @@ function Home() {
   const chartConfig = {
     backgroundGradientFrom: "#fff",
     backgroundGradientTo: "#fff",
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    color: (opacity = 1) => "#003366",
     strokeWidth: 2,
+    propsForDots: {
+      r: "6",
+      strokeWidth: "2",
+      stroke: "#00BFA6",
+    },
+    propsForBackgroundLines: {
+      stroke: "#fff",
+    },
   };
 
   const data = {
@@ -86,7 +94,7 @@ function Home() {
     datasets: [
       {
         data: patientData,
-        color: (opacity = 1) => `rgba(51, 102, 255, ${opacity})`,
+        color: (opacity = 1) => "#00BFA6",
         strokeWidth: 2,
       },
     ],
@@ -116,8 +124,9 @@ function Home() {
           </View>
         </Card>
       </View>
+      <AppointmentStats refreshing={refreshing} />
       <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Nouveaux patients par mois</Text>
+        <Text style={styles.chartTitle}>Patients par mois</Text>
         <LineChart
           data={data}
           width={Dimensions.get("window").width - 50}
@@ -126,7 +135,6 @@ function Home() {
           bezier
           style={styles.chart}
         />
-        <AppointmentStats refreshing={refreshing} />
       </View>
     </ScrollView>
   );
