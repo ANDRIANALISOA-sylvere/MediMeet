@@ -6,6 +6,8 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Alert,
+  TextInput,
 } from "react-native";
 import { Icon, Button } from "@ui-kitten/components";
 import {
@@ -19,6 +21,21 @@ import axios from "../../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReviewList from "./ReviewList";
 
+const CommentInput = ({ value, onChangeText }: any) => {
+  const [localComment, setLocalComment] = useState(value);
+
+  return (
+    <TextInput
+      style={styles.commentInput}
+      placeholder="Écrivez votre commentaire ici"
+      value={localComment}
+      onChangeText={setLocalComment}
+      onEndEditing={() => onChangeText(localComment)}
+      multiline
+    />
+  );
+};
+
 function DoctorDetails({ route }: any) {
   const { doctor } = route.params;
   const [selectedMonth, setSelectedMonth] = useState(new Date());
@@ -26,11 +43,59 @@ function DoctorDetails({ route }: any) {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [availableDates, setAvailableDates] = useState<string[]>([]);
   const [reviews, setReviews] = useState([]);
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
     updateAvailableDates(selectedMonth);
     fetchReviews();
   }, [selectedMonth]);
+
+  const handleAddReview = async () => {
+    if (newRating === 0 || newComment.trim() === "") {
+      Alert.alert(
+        "Erreur",
+        "Veuillez donner une note et écrire un commentaire."
+      );
+      return;
+    }
+
+    const userString = await AsyncStorage.getItem("user");
+    if (!userString) {
+      Alert.alert("Erreur", "Utilisateur non connecté");
+      return;
+    }
+
+    const user = JSON.parse(userString);
+    const patientId = user._id;
+
+    try {
+      const response = await axios.post("/review", {
+        doctorId: doctor._id,
+        patientId,
+        rating: newRating,
+        comment: newComment,
+      });
+
+      if (response.data.success) {
+        Alert.alert("Succès", "Votre avis a été ajouté avec succès.");
+        setNewRating(0);
+        setNewComment("");
+        fetchReviews();
+      } else {
+        Alert.alert(
+          "Erreur",
+          "Impossible d'ajouter votre avis. Veuillez réessayer."
+        );
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de l'avis:", error);
+      Alert.alert(
+        "Erreur",
+        "Une erreur s'est produite. Veuillez réessayer plus tard."
+      );
+    }
+  };
 
   const updateAvailableDates = (month: Date) => {
     const start = startOfMonth(month);
@@ -261,6 +326,27 @@ function DoctorDetails({ route }: any) {
     </>
   );
 
+  const renderFooter = () => (
+    <View style={styles.addReviewContainer}>
+      <Text style={styles.addReviewTitle}>Ajouter un avis</Text>
+      <View style={styles.ratingContainer}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <TouchableOpacity key={star} onPress={() => setNewRating(star)}>
+            <Icon
+              name={star <= newRating ? "star" : "star-outline"}
+              fill={star <= newRating ? "orange" : "gray"}
+              style={styles.starIcon}
+            />
+          </TouchableOpacity>
+        ))}
+      </View>
+      <CommentInput value={newComment} onChangeText={setNewComment} />
+      <Button style={styles.submitButton} onPress={handleAddReview}>
+        Soumettre l'avis
+      </Button>
+    </View>
+  );
+
   return (
     <FlatList
       ListHeaderComponent={renderHeader}
@@ -268,6 +354,7 @@ function DoctorDetails({ route }: any) {
       renderItem={({ item }) => <ReviewList review={item} />}
       keyExtractor={(item: any) => item._id}
       contentContainerStyle={styles.container}
+      ListFooterComponent={renderFooter}
     />
   );
 }
@@ -431,6 +518,40 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     marginRight: 4,
+  },
+  addReviewContainer: {
+    backgroundColor: "#F5F5F5",
+    padding: 15,
+    marginTop: 20,
+    borderRadius: 10,
+    margin: -20,
+  },
+  addReviewTitle: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    color: "#003366",
+    marginBottom: 10,
+  },
+  ratingContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+    marginBottom: 10,
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    padding: 10,
+    minHeight: 100,
+    textAlignVertical: "top",
+    fontFamily: "Poppins",
+    backgroundColor: "#fff",
+  },
+  submitButton: {
+    marginTop: 10,
+    backgroundColor: "#00BFA6",
+    borderColor: "#00BFA6",
   },
 });
 
