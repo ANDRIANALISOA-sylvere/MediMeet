@@ -3,32 +3,43 @@ const ReviewModel = require("../models/Review.model");
 const mongoose = require("mongoose");
 
 const addDoctor = async (req, res) => {
-  const { _id, specialty, experience, price, about, location } =
-    req.body;
+  const { _id, specialty, experience, price, about, location } = req.body;
 
-    console.log(req.body)
+  console.log(req.body);
 
   try {
-    const doctor = new Doctor({
-      _id,
-      specialty,
-      experience,
-      price,
-      about,
-      location,
-    });
+    let doctor = await Doctor.findById(_id);
 
-    await doctor.save();
+    if (doctor) {
+      doctor.specialty = specialty;
+      doctor.experience = experience;
+      doctor.price = price;
+      doctor.about = about;
+      doctor.location = location;
+
+      await doctor.save();
+    } else {
+      doctor = new Doctor({
+        _id,
+        specialty,
+        experience,
+        price,
+        about,
+        location,
+      });
+
+      await doctor.save();
+    }
 
     const populatedDoctor = await Doctor.findById(doctor._id).populate(
       "_id",
       "name email role phone"
     );
 
-    res.status(201).json({ doctor: populatedDoctor });
+    res.status(200).json({ doctor: populatedDoctor });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error adding doctor");
+    res.status(500).json("Error adding or updating doctor");
   }
 };
 

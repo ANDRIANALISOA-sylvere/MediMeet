@@ -1,54 +1,77 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { Layout, Text, Input, Button, Spinner } from "@ui-kitten/components";
+import { Text, Input, Button, Spinner } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import Toast from "react-native-toast-message";
 
 interface Doctor {
-  specialty: string;
-  experience: string;
-  price: string;
-  location: string;
   about: string;
+  experience: string;
+  location: string;
+  price: string;
+  specialty: string;
 }
 
 const ProfileDoctor: React.FC = () => {
   const [doctor, setDoctor] = useState<Doctor>({
-    specialty: "",
-    experience: "",
-    price: "",
-    location: "",
     about: "",
+    experience: "",
+    location: "",
+    price: "",
+    specialty: "",
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [fetchingData, setFetchingData] = useState<boolean>(true);
 
   useEffect(() => {
-    const getUserId = async () => {
+    const getUserIdAndDoctorData = async () => {
       try {
         const userData = await AsyncStorage.getItem("user");
         if (userData) {
           const user = JSON.parse(userData);
           setUserId(user._id);
+          await fetchDoctorData(user._id);
         }
       } catch (error) {
-        console.error(
-          "Erreur lors de la récupération de l'ID utilisateur:",
-          error
-        );
+        console.error("Erreur lors de la récupération des données:", error);
+      } finally {
+        setFetchingData(false);
       }
     };
 
-    getUserId();
+    getUserIdAndDoctorData();
   }, []);
 
-  const showToast = (type: any, text1: any, text2: any) => {
+  const fetchDoctorData = async (id: string) => {
+    try {
+      const response = await axios.get(`/doctor/${id}`);
+      if (response.data && response.data.data) {
+        const { about, experience, location, price, specialty } =
+          response.data.data;
+        setDoctor({
+          about,
+          experience: experience.toString(),
+          location,
+          price: price.toString(),
+          specialty,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des données du docteur:",
+        error
+      );
+    }
+  };
+
+  const showToast = (type: any, text1: string, text2: string) => {
     Toast.show({
-      type: type,
+      type,
       position: "top",
-      text1: text1,
-      text2: text2,
+      text1,
+      text2,
       visibilityTime: 4000,
       autoHide: true,
       topOffset: 30,
@@ -68,34 +91,42 @@ const ProfileDoctor: React.FC = () => {
         ...doctor,
         _id: userId,
       });
-      showToast("success", "Succès", "Profil créé avec succès" + " 💯");
-      console.log("Profil créé avec succès:", response.data);
+      showToast("success", "Succès", "Profil mis à jour avec succès 💯");
+      console.log("Profil mis à jour avec succès:", response.data);
     } catch (error) {
-      console.error("Erreur lors de la création du profil:", error);
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      showToast("error", "Erreur", "Échec de la mise à jour du profil");
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetchingData) {
+    return (
+      <View style={styles.container}>
+        <Spinner size="large" />
+      </View>
+    );
+  }
+
   return (
     <>
       <ScrollView style={styles.container}>
         <View style={styles.layout}>
-          <Text style={styles.title}>Editer votre profile</Text>
+          <Text style={styles.title}>Éditer votre profil</Text>
 
           <Input
             label="Spécialité"
-            placeholder="Ex: Dentiste"
+            placeholder="Ex: Cardiologue"
             value={doctor.specialty}
             onChangeText={(text) => setDoctor({ ...doctor, specialty: text })}
             style={styles.input}
-            appearance="default"
           />
           <Input
             label="Expérience (années)"
             placeholder="Ex: 2"
             keyboardType="numeric"
-            value={doctor.experience.toString()}
+            value={doctor.experience}
             onChangeText={(text) => setDoctor({ ...doctor, experience: text })}
             style={styles.input}
           />
@@ -103,13 +134,13 @@ const ProfileDoctor: React.FC = () => {
             label="Prix (Ar)"
             placeholder="Ex: 2000"
             keyboardType="numeric"
-            value={doctor.price.toString()}
+            value={doctor.price}
             onChangeText={(text) => setDoctor({ ...doctor, price: text })}
             style={styles.input}
           />
           <Input
             label="Localisation"
-            placeholder="Ex: Antananarivo"
+            placeholder="Ex: Fianarantsoa"
             value={doctor.location}
             onChangeText={(text) => setDoctor({ ...doctor, location: text })}
             style={styles.input}
@@ -126,10 +157,10 @@ const ProfileDoctor: React.FC = () => {
 
           <Button
             onPress={handleSubmit}
-            style={styles.button}
+            status="success"
             disabled={loading}
           >
-            {loading ? <Spinner size="small" /> : "Editer le profil"}
+            {loading ? <Spinner size="small" /> : "Mettre à jour le profil"}
           </Button>
         </View>
       </ScrollView>
@@ -141,6 +172,7 @@ const ProfileDoctor: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:"#fff"
   },
   layout: {
     flex: 1,
