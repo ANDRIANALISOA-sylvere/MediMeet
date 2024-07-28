@@ -236,7 +236,10 @@ function DoctorDetails({ route }: any) {
               />
             ))}
             <Text style={styles.ratingText}>
-              {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
+              {doctor.averageRating !== null &&
+              doctor.averageRating !== undefined
+                ? `${doctor.averageRating.toFixed(1)} (${doctor.reviewCount})`
+                : "Pas encore noté"}
             </Text>
           </View>
         </View>

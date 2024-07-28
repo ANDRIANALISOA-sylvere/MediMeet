@@ -137,7 +137,12 @@ function SearchDoctor({ navigation }: any) {
                 <View style={styles.ratingContainer}>
                   <Icon name="star" style={styles.starIcon} fill="orange" />
                   <Text style={styles.ratingText}>
-                    {doctor.averageRating.toFixed(1)} ({doctor.reviewCount})
+                    {doctor.averageRating !== null &&
+                    doctor.averageRating !== undefined
+                      ? `${doctor.averageRating.toFixed(1)} (${
+                          doctor.reviewCount
+                        })`
+                      : "0"}
                   </Text>
                 </View>
               </View>
