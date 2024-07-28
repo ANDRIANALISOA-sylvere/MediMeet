@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "../../../api/axios";
+import axios from "../../..//api/axios";
+import { Button, Input } from "@ui-kitten/components";
+import Toast from "react-native-toast-message";
 
 interface Availability {
   day: string;
@@ -12,6 +22,9 @@ const Disponibilite = () => {
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newDay, setNewDay] = useState("");
+  const [newStartTime, setNewStartTime] = useState("");
 
   useEffect(() => {
     fetchAvailabilities();
@@ -39,10 +52,64 @@ const Disponibilite = () => {
     }
   };
 
+  const showToast = (type: any, text1: any, text2: any) => {
+    Toast.show({
+      type: type,
+      position: "top",
+      text1: text1,
+      text2: text2,
+      visibilityTime: 4000,
+      autoHide: true,
+      topOffset: 30,
+      bottomOffset: 40,
+    });
+  };
+
+  const addAvailability = async () => {
+    if (!newDay || !newStartTime) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+      return;
+    }
+
+    try {
+      const userString = await AsyncStorage.getItem("user");
+      if (!userString) {
+        setError("Utilisateur non trouvé");
+        return;
+      }
+
+      const user = JSON.parse(userString);
+      const doctorId = user._id;
+
+      const newAvailability = {
+        day: newDay,
+        startTime: newStartTime,
+      };
+
+      const response = await axios.post(
+        `/doctor/${doctorId}/availability`,
+        newAvailability
+      );
+
+      setAvailabilities([...availabilities, newAvailability]);
+      setNewDay("");
+      setNewStartTime("");
+      setShowAddForm(false);
+      showToast("success", "Succès", "Nouvelle disponibilité ajoutée" + " 💯");
+    } catch (err) {
+      console.error("Erreur lors de l'ajout de la disponibilité:", err);
+      Alert.alert("Erreur', 'Une erreur est survenue lors de l'ajout");
+    }
+  };
+
   const renderAvailabilityItem = ({ item }: { item: Availability }) => (
     <View style={styles.availabilityItem}>
-      <Text style={styles.dayText}>{formatDate(item.day)}</Text>
-      <Text style={styles.timeText}>{item.startTime}</Text>
+      <View style={styles.dateBadge}>
+        <Text style={styles.dateBadgeText}>{formatDate(item.day)}</Text>
+      </View>
+      <View style={styles.timeBadge}>
+        <Text style={styles.timeBadgeText}>{item.startTime}</Text>
+      </View>
     </View>
   );
 
@@ -60,14 +127,41 @@ const Disponibilite = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={availabilities}
-        renderItem={renderAvailabilityItem}
-        keyExtractor={(item, index) => `${item.day}-${index}`}
-        ListEmptyComponent={<Text>Aucune disponibilité trouvée</Text>}
-      />
-    </View>
+    <>
+      <View style={styles.container}>
+        <FlatList
+          data={availabilities}
+          renderItem={renderAvailabilityItem}
+          keyExtractor={(item, index) => `${item.day}-${index}`}
+          ListEmptyComponent={<Text>Aucune disponibilité trouvée</Text>}
+        />
+
+        {!showAddForm ? (
+          <Button style={styles.addButton} onPress={() => setShowAddForm(true)}>
+            Ajouter une disponibilité
+          </Button>
+        ) : (
+          <View style={styles.formContainer}>
+            <Input
+              style={styles.input}
+              placeholder="Date (YYYY/MM/DD)"
+              value={newDay}
+              onChangeText={setNewDay}
+            />
+            <Input
+              style={styles.input}
+              placeholder="Heure de début (HH:MM)"
+              value={newStartTime}
+              onChangeText={setNewStartTime}
+            />
+            <Button style={styles.submitButton} onPress={addAvailability}>
+              Ajouter
+            </Button>
+          </View>
+        )}
+      </View>
+      <Toast />
+    </>
   );
 };
 
@@ -77,25 +171,44 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 20,
-    marginBottom: 16,
-    fontFamily: "Poppins-Bold",
-  },
   availabilityItem: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    marginBottom: 10,
   },
-  dayText: {
-    fontSize: 16,
-    fontFamily: "Poppins",
+  dateBadge: {
+    backgroundColor: "#E3F2FD",
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  timeText: {
-    fontSize: 16,
-    fontFamily: "Poppins-Bold",
+  dateBadgeText: {
+    color: "#2196F3",
+    fontWeight: "bold",
+  },
+  timeBadge: {
+    backgroundColor: "#E8F5E9",
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  timeBadgeText: {
+    color: "#4CAF50",
+    fontWeight: "bold",
+  },
+  addButton: {
+    marginTop: 20,
+  },
+  formContainer: {
+    marginTop: 20,
+  },
+  input: {
+    marginBottom: 10,
+  },
+  submitButton: {
+    marginTop: 10,
   },
 });
 
