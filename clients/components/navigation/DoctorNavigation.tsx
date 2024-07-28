@@ -16,6 +16,7 @@ import PatientsScreen from "../screen/DoctorScreen/Patient";
 import AccountScreen from "../screen/DoctorScreen/Account";
 import MessageDetails from "../screen/DoctorScreen/MessageDetails";
 import ProfileDoctor from "../screen/DoctorScreen/ProfileDoctor";
+import Disponibilite from "../screen/DoctorScreen/Disponibilite";
 
 function DoctorNavigation() {
   return (
@@ -179,6 +180,18 @@ function DoctorMainNavigation() {
         options={{
           headerShown: true,
           title: "Profile",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="Disponibilite"
+        component={Disponibilite}
+        options={{
+          headerShown: true,
+          title: "Disponibilité",
           headerTitleStyle: {
             fontFamily: "Poppins-Bold",
             color: "#003366",

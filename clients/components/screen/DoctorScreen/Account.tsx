@@ -24,7 +24,10 @@ function Account({ navigation }: any) {
         />
       </TouchableOpacity>
       <Divider />
-      <View style={styles.menuItem}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("Disponibilite")}
+        style={styles.menuItem}
+      >
         <Icon name="clock-outline" fill="#00BFA6" style={styles.icon} />
         <Text style={styles.text}>Disponibilité</Text>
         <Icon
@@ -32,7 +35,7 @@ function Account({ navigation }: any) {
           fill="#8e8e8e"
           style={styles.arrowIcon}
         />
-      </View>
+      </TouchableOpacity>
       <Divider />
       <View style={styles.menuItem}>
         <Icon name="log-out" fill="red" style={styles.icon}></Icon>
