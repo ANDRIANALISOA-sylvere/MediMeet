@@ -195,6 +195,8 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+    borderWidth: 2,
+    borderColor: "#00BFA6",
   },
   doctorInfo: {
     flex: 1,

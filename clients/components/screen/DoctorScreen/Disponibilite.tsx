@@ -104,9 +104,11 @@ const Disponibilite = () => {
 
   const renderAvailabilityItem = ({ item }: { item: Availability }) => (
     <View style={styles.availabilityItem}>
+      <Text style={styles.dayLabel}>Jour :</Text>
       <View style={styles.dateBadge}>
         <Text style={styles.dateBadgeText}>{formatDate(item.day)}</Text>
       </View>
+      <Text style={styles.timeLabel}>Heure de début :</Text>
       <View style={styles.timeBadge}>
         <Text style={styles.timeBadgeText}>{item.startTime}</Text>
       </View>
@@ -172,27 +174,41 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   availabilityItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 12,
+    backgroundColor: "#003366",
+    borderRadius: 10,
+    padding: 15,
     marginBottom: 10,
+  },
+  dayLabel: {
+    fontSize: 14,
+    color: "#fff",
+    marginBottom: 5,
+    fontFamily: "Poppins-Bold",
   },
   dateBadge: {
     backgroundColor: "#E3F2FD",
     borderRadius: 20,
     paddingVertical: 5,
     paddingHorizontal: 10,
+    alignSelf: "flex-start",
+    marginBottom: 10,
   },
   dateBadgeText: {
     color: "#2196F3",
     fontWeight: "bold",
+  },
+  timeLabel: {
+    fontSize: 14,
+    fontFamily: "Poppins-Bold",
+    color: "#fff",
+    marginBottom: 5,
   },
   timeBadge: {
     backgroundColor: "#E8F5E9",
     borderRadius: 20,
     paddingVertical: 5,
     paddingHorizontal: 10,
+    alignSelf: "flex-start",
   },
   timeBadgeText: {
     color: "#4CAF50",
