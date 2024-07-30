@@ -5,6 +5,7 @@ import {
   ScrollView,
   RefreshControl,
   Dimensions,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
@@ -21,6 +22,7 @@ function Home() {
   const [reviewCount, setReviewCount] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [patientData, setPatientData] = useState([0, 0, 0]);
+  const [doctorName, setDoctorName] = useState("");
 
   const fetchDoctorData = async () => {
     try {
@@ -31,6 +33,7 @@ function Home() {
 
       const user = JSON.parse(userString);
       const doctorId = user._id;
+      setDoctorName(user.name);
 
       const patientResponse = await axios.get(
         `/doctor/patients?doctorId=${doctorId}`
@@ -74,32 +77,6 @@ function Home() {
     fetchDoctorData().then(() => setRefreshing(false));
   }, []);
 
-  const chartConfig = {
-    backgroundGradientFrom: "#fff",
-    backgroundGradientTo: "#fff",
-    color: (opacity = 1) => "#003366",
-    strokeWidth: 2,
-    propsForDots: {
-      r: "6",
-      strokeWidth: "2",
-      stroke: "#00BFA6",
-    },
-    propsForBackgroundLines: {
-      stroke: "#fff",
-    },
-  };
-
-  const data = {
-    labels: ["Il y a 2 mois", "Le mois dernier", "Ce mois-ci"],
-    datasets: [
-      {
-        data: patientData,
-        color: (opacity = 1) => "#00BFA6",
-        strokeWidth: 2,
-      },
-    ],
-  };
-
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -107,6 +84,19 @@ function Home() {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
+      <View style={styles.header}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Image
+            source={require("../../../assets/images/avatar4.jpg")}
+            style={styles.avatar}
+          />
+          <View style={styles.textContainer}>
+            <Text style={styles.greetingText}>Bonjour</Text>
+            <Text style={styles.nameText}>Dr. {doctorName}</Text>
+          </View>
+        </View>
+      </View>
+
       <View style={styles.row}>
         <Card style={[styles.card, styles.blueCard]}>
           <PersonIcon style={styles.icon} fill="#3366FF" />
@@ -125,17 +115,6 @@ function Home() {
         </Card>
       </View>
       <AppointmentStats refreshing={refreshing} />
-      {/* <View style={styles.chartCard}>
-        <Text style={styles.chartTitle}>Patients par mois</Text>
-        <LineChart
-          data={data}
-          width={Dimensions.get("window").width - 50}
-          height={220}
-          chartConfig={chartConfig}
-          bezier
-          style={styles.chart}
-        />
-      </View> */}
     </ScrollView>
   );
 }
@@ -145,6 +124,32 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 16,
     backgroundColor: "#fff",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  textContainer: {
+    flexDirection: "column",
+    marginLeft: 10,
+  },
+  greetingText: {
+    fontSize: 15,
+    color: "#003366",
+    fontFamily: "Poppins",
+  },
+  nameText: {
+    fontSize: 18,
+    color: "#003366",
+    fontFamily: "Poppins-Bold",
+    textTransform: "capitalize",
   },
   row: {
     flexDirection: "row",
