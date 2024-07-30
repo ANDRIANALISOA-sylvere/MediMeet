@@ -9,10 +9,10 @@ import {
   RefreshControl,
   ActivityIndicator,
   Modal,
-  Pressable,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { format, isBefore, isToday, isFuture } from "date-fns";
+import { parseISO, isToday, isBefore, isFuture } from "date-fns";
+import { toZonedTime, format } from "date-fns-tz";
 import axios from "../../../api/axios";
 import { Button, Icon } from "@ui-kitten/components";
 
@@ -152,13 +152,21 @@ function Appointment() {
   };
 
   const renderAppointmentItem = ({ item }: { item: Appointment }) => {
-    const appointmentDate = new Date(item.appointmentDate);
-    const formattedTime = format(appointmentDate, "HH:mm");
-    const formattedDate = format(appointmentDate, "dd MMM yyyy");
+    const utcDate = parseISO(item.appointmentDate);
+
+    // Convertissez la date UTC en date locale
+    const appointmentDate = toZonedTime(utcDate, "UTC");
+
+    // Formatez la date et l'heure
+    const formattedTime = format(appointmentDate, "HH:mm", { timeZone: "UTC" });
+    const formattedDate = format(appointmentDate, "dd MMM yyyy", {
+      timeZone: "UTC",
+    });
 
     const getAppointmentStatus = () => {
+      const now = new Date();
       if (isToday(appointmentDate)) return "Aujourd'hui";
-      if (isBefore(appointmentDate, new Date())) return "Antérieur";
+      if (isBefore(appointmentDate, now)) return "Antérieur";
       if (isFuture(appointmentDate)) return "A venir";
       return "";
     };
@@ -167,7 +175,7 @@ function Appointment() {
       switch (status.toLowerCase()) {
         case "completed":
           return "Terminé";
-        case "canceled":
+        case "cancelled":
           return "Annulé";
         case "pending":
           return "En attente";
@@ -219,7 +227,6 @@ function Appointment() {
       </TouchableOpacity>
     );
   };
-
   return (
     <View style={styles.container}>
       {renderFilterButtons()}
