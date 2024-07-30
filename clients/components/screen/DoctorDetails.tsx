@@ -48,6 +48,13 @@ function DoctorDetails({ route }: any) {
   const [newComment, setNewComment] = useState("");
 
   useEffect(() => {
+    const today = new Date();
+    setSelectedMonth(startOfMonth(today));
+    updateAvailableDates(today);
+    fetchReviews();
+  }, []);
+
+  useEffect(() => {
     updateAvailableDates(selectedMonth);
     fetchReviews();
   }, [selectedMonth]);
@@ -121,8 +128,23 @@ function DoctorDetails({ route }: any) {
     const start = startOfMonth(month);
     const end = endOfMonth(month);
     const daysInMonth = eachDayOfInterval({ start, end });
+    const now = new Date();
 
     const availableDatesInMonth = daysInMonth
+      .filter((date) => {
+        if (format(date, "yyyy/MM/dd") === format(now, "yyyy/MM/dd")) {
+          return doctor.availability.some((avail: any) => {
+            const availDate = parse(
+              `${avail.day} ${avail.startTime}`,
+              "yyyy/MM/dd HH:mm",
+              new Date()
+            );
+            return availDate > now;
+          });
+        } else {
+          return date >= now;
+        }
+      })
       .filter((date) =>
         doctor.availability.some((avail: any) => {
           const availDate = parse(avail.day, "yyyy/MM/dd", new Date());
@@ -148,7 +170,8 @@ function DoctorDetails({ route }: any) {
       const newMonth = new Date(
         prevMonth.setMonth(prevMonth.getMonth() + increment)
       );
-      return newMonth;
+      const today = new Date();
+      return newMonth < startOfMonth(today) ? startOfMonth(today) : newMonth;
     });
     setSelectedDate(null);
     setSelectedTime(null);
@@ -275,8 +298,21 @@ function DoctorDetails({ route }: any) {
 
       <Text style={styles.sectionTitle}>Disponibilité</Text>
       <View style={styles.monthSelector}>
-        <TouchableOpacity onPress={() => handleMonthChange(-1)}>
-          <Icon name="arrow-back" fill="#003366" style={styles.arrowIcon} />
+        <TouchableOpacity
+          onPress={() => handleMonthChange(-1)}
+          disabled={
+            format(selectedMonth, "yyyy/MM") === format(new Date(), "yyyy/MM")
+          }
+        >
+          <Icon
+            name="arrow-back"
+            fill={
+              format(selectedMonth, "yyyy/MM") === format(new Date(), "yyyy/MM")
+                ? "#CCCCCC"
+                : "#003366"
+            }
+            style={styles.arrowIcon}
+          />
         </TouchableOpacity>
         <Text style={styles.monthText}>
           {format(selectedMonth, "MMMM yyyy")}
@@ -314,7 +350,14 @@ function DoctorDetails({ route }: any) {
         <>
           <Text style={styles.sectionTitle}>choisir l'heure</Text>
           <FlatList
-            data={availableTimes}
+            data={availableTimes.filter((time: any) => {
+              const dateTime = parse(
+                `${selectedDate} ${time}`,
+                "yyyy/MM/dd HH:mm",
+                new Date()
+              );
+              return dateTime > new Date();
+            })}
             keyExtractor={(item) => item}
             horizontal
             renderItem={({ item }) => (
