@@ -1,11 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Alert,
+  Linking,
+} from "react-native";
 import io, { Socket } from "socket.io-client";
 import { Button, Icon, Input, Text } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
-import { ImageBackground } from "react-native";
+import { ImageBackground, Image } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import * as DocumentPicker from "expo-document-picker";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
 
@@ -15,7 +23,12 @@ interface Message {
   content: string;
   timestamp: string;
   read: boolean;
+  attachment?: {
+    type: "pdf" | "docx" | "image";
+    url: string;
+  };
 }
+
 interface Doctor {
   _id: {
     _id: string;
@@ -88,19 +101,77 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
     }
   }, [messages]);
 
-  const sendMessage = () => {
-    if (message.trim() && socket && userId) {
+  const openFile = async (url: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.error("Erreur lors de l'ouverture du fichier:", error);
+      Alert.alert("Erreur", "Impossible d'ouvrir le fichier");
+    }
+  };
+
+  const sendMessage = async (
+    content: string,
+    attachment?: { type: "pdf" | "docx" | "image"; url: string }
+  ) => {
+    if ((content.trim() || attachment) && socket && userId) {
       const messageData: Omit<Message, "timestamp" | "read"> & {
         roomId: string;
       } = {
         senderId: userId,
         receiverId: doctor._id._id,
-        content: message,
+        content: content,
         roomId: roomId,
+        attachment: attachment,
       };
 
       socket.emit("sendMessage", messageData);
       setMessage("");
+    }
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "image/*",
+        ],
+      });
+
+      if (result.assets && result.assets.length > 0) {
+        const file = result.assets[0];
+        const fileExtension = file.name.split(".").pop()?.toLowerCase();
+        let fileType: "pdf" | "docx" | "image";
+
+        if (fileExtension === "pdf") {
+          fileType = "pdf";
+        } else if (fileExtension === "docx") {
+          fileType = "docx";
+        } else {
+          fileType = "image";
+        }
+
+        const formData = new FormData();
+        formData.append("file", {
+          uri: file.uri,
+          type: file.mimeType,
+          name: file.name,
+        } as any);
+
+        const response = await axios.post("/upload", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.data && response.data.url) {
+          sendMessage("", { type: fileType, url: response.data.url });
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sélection du fichier:", error);
     }
   };
 
@@ -110,7 +181,32 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
         item.senderId === userId ? styles.sentMessage : styles.receivedMessage
       }
     >
-      <Text>{item.content}</Text>
+      {item.content && <Text>{item.content}</Text>}
+      {item.attachment?.url &&
+        (item.attachment.type === "image" ? (
+          <Image
+            source={{ uri: item.attachment.url }}
+            style={styles.attachmentImage}
+          />
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              if (item.attachment?.url) {
+                openFile(item.attachment.url);
+              }
+            }}
+            style={styles.pdfContainer}
+          >
+            <Icon
+              name="file-text-outline"
+              fill="#FF0000"
+              style={styles.pdfIcon}
+            />
+            <Text style={styles.pdfText}>
+              {item.attachment.url.split("/").pop() || "Document PDF"}
+            </Text>
+          </TouchableOpacity>
+        ))}
     </View>
   );
 
@@ -135,6 +231,13 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
         </KeyboardAwareScrollView>
       </View>
       <View style={styles.inputContainer}>
+        <TouchableOpacity onPress={pickDocument} style={styles.attachButton}>
+          <Icon
+            name="file-add-outline"
+            fill="white"
+            style={styles.attachIcon}
+          />
+        </TouchableOpacity>
         <Input
           value={message}
           onChangeText={setMessage}
@@ -143,7 +246,7 @@ function ChatDetailsScreen({ route }: { route: { params: RouteParams } }) {
           textStyle={styles.inputText}
         />
         <Button
-          onPress={sendMessage}
+          onPress={() => sendMessage(message)}
           style={styles.sendButton}
           accessoryLeft={<Icon name="paper-plane-outline" fill="white" />}
           status="control"
@@ -212,6 +315,46 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     justifyContent: "flex-end",
+  },
+  attachButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  attachIcon: {
+    width: 24,
+    height: 24,
+  },
+  attachmentImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "contain",
+    marginTop: 10,
+  },
+  attachmentText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    marginTop: 5,
+  },
+  pdfContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0F0F0",
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  pdfIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 10,
+  },
+  pdfText: {
+    color: "black",
+    fontFamily: "Poppins",
+    textDecorationLine: "underline",
   },
 });
 

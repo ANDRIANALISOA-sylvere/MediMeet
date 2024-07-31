@@ -16,8 +16,8 @@ const http = require("http");
 const { Server } = require("socket.io");
 const Message = require("./models/Message.model");
 const MessageRouter = require("./routes/Message.route");
-const MapRouter = require("./routes/Map.route");
-const TwilioRouter = require("./routes/Twilio.route");
+const multer = require("multer");
+const path = require("path");
 
 dotenv.config();
 
@@ -50,6 +50,17 @@ require("./config/passport");
 
 const PORT = process.env.PORT || 8800;
 
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage: storage });
+
 io.on("connection", (socket) => {
   console.log("Un utilisateur s'est connecté");
 
@@ -59,15 +70,23 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendMessage", async (data) => {
-    const { senderId, receiverId, content, roomId } = data;
+    const { senderId, receiverId, content, roomId, attachment } = data;
     try {
-      const newMessage = new Message({
+      let newMessage = new Message({
         senderId,
         receiverId,
         content,
         timestamp: new Date().toISOString(),
         read: false,
       });
+
+      if (attachment) {
+        newMessage.attachment = {
+          type: attachment.type,
+          url: attachment.url,
+        };
+      }
+
       await newMessage.save();
       io.to(roomId).emit("message", newMessage);
     } catch (error) {
@@ -88,8 +107,12 @@ app.use("/api", PatientRouter);
 app.use("/api", ReviewRouter);
 app.use("/api", MedicalRecord);
 app.use("/api", MessageRouter);
-app.use("/api", MapRouter);
-app.use("/api", TwilioRouter);
+app.post("/api/upload", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("Aucun fichier n'a été uploadé.");
+  }
+  res.send({ url: `http://192.168.43.149:8800/uploads/${req.file.filename}` });
+});
 
 server.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);
