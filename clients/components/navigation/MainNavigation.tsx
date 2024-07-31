@@ -17,6 +17,7 @@ import AccountScreen from "../screen/AccountScreen";
 import DoctorDetails from "../screen/DoctorDetails";
 import ChatDetailsScreen from "../screen/DoctorScreen/ChatDetailsScreen";
 import SearchDoctor from "../screen/SearchDoctor";
+import ProfilePatient from "../screen/ProfilePatient";
 
 function HomeStack() {
   return (
@@ -133,12 +134,16 @@ function TabNavigation() {
           name="Account"
           component={AccountScreen}
           options={{
-            title: "Compte",
-            headerShown: false,
+            title: "Mon Compte",
+            headerShown: true,
             tabBarLabel: "Compte",
             tabBarLabelStyle: {
               fontFamily: "Poppins",
               fontSize: 10,
+            },
+            headerTitleStyle: {
+              fontFamily: "Poppins-Bold",
+              color: "#003366",
             },
             tabBarIcon: ({ color, size, focused }) => (
               <Icon
@@ -206,6 +211,18 @@ function MainNavigation() {
         options={{
           headerShown: true,
           title: "Chercher un médecin",
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="ProfilePatient"
+        component={ProfilePatient}
+        options={{
+          headerShown: true,
+          title: "Profile",
           headerTitleStyle: {
             fontFamily: "Poppins-Bold",
             color: "#003366",

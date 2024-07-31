@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     fontFamily: "Poppins-Bold",
+    color:"#003366"
   },
   doctorItem: {
     flexDirection: "row",

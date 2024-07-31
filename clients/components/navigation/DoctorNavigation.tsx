@@ -127,6 +127,10 @@ function DoctorNavigation() {
             fontFamily: "Poppins",
             fontSize: 10,
           },
+          headerTitleStyle: {
+            fontFamily: "Poppins-Bold",
+            color: "#003366",
+          },
           tabBarIcon: ({ color, size, focused }) => (
             <Icon
               name={focused ? "person" : "person-outline"}

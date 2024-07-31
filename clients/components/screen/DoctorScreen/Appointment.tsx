@@ -109,7 +109,7 @@ function Appointment() {
 
   const filterButtons = [
     { label: "Tous", value: null },
-    { label: "Terminé", value: "completed" },
+    { label: "Confirmé", value: "completed" },
     { label: "En attente", value: "pending" },
     { label: "Annulé", value: "cancelled" },
   ];
@@ -174,7 +174,7 @@ function Appointment() {
     const getTranslatedStatus = (status: string) => {
       switch (status.toLowerCase()) {
         case "completed":
-          return "Terminé";
+          return "Confirmé";
         case "cancelled":
           return "Annulé";
         case "pending":

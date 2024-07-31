@@ -11,25 +11,38 @@ const addPatient = async (req, res) => {
   console.log(_id, dateOfBirth, gender, address, avatar);
 
   try {
-    const patient = new Patient({
-      _id,
-      dateOfBirth,
-      gender,
-      address,
-      avatar,
-    });
+    let patient = await Patient.findById(_id);
 
-    await patient.save();
+    if (patient) {
+      patient.dateOfBirth = dateOfBirth;
+      patient.gender = gender;
+      patient.address = address;
+      if (avatar) {
+        patient.avatar = avatar;
+      }
+
+      await patient.save();
+    } else {
+      patient = new Patient({
+        _id,
+        dateOfBirth,
+        gender,
+        address,
+        avatar,
+      });
+
+      await patient.save();
+    }
 
     const populatedPatient = await Patient.findById(patient._id).populate(
       "_id",
       "name email role phone"
     );
 
-    res.status(201).json({ patient: populatedPatient });
+    res.status(200).json({ patient: populatedPatient });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error adding patient" });
+    res.status(500).json({ error: "Error adding or updating patient" });
   }
 };
 
