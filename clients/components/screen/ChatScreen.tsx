@@ -8,10 +8,11 @@ import {
   RefreshControl,
 } from "react-native";
 import axios from "../../api/axios";
-import { Input, Icon } from "@ui-kitten/components";
+import { Input, Icon, Avatar } from "@ui-kitten/components";
 import io, { Socket } from "socket.io-client";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DefaultAvatar from "./DefaultAvatar";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
 
@@ -31,6 +32,7 @@ interface Doctor {
   price: number;
   about: string;
   location: string;
+  avatar: string;
   availability: Availability[];
   createdAt: string;
   updatedAt: string;
@@ -123,10 +125,17 @@ function ChatScreen({ navigation }: any) {
   const renderDoctorItem = ({ item }: { item: Doctor }) => (
     <TouchableOpacity onPress={() => handleDoctorPress(item)}>
       <View style={styles.doctorItem}>
-        <Image
-          source={require("../../assets/images/docteur.webp")}
-          style={styles.avatar}
-        />
+        {item.avatar ? (
+          <Avatar
+            source={{ uri: item.avatar }}
+            size="giant"
+            style={styles.avatar}
+          />
+        ) : (
+          <View style={{ marginRight: 10 }}>
+            <DefaultAvatar name={item._id.name}></DefaultAvatar>
+          </View>
+        )}
         <View style={styles.doctorInfo}>
           <Text style={styles.doctorName}>Dr. {item._id.name}</Text>
           <Text style={styles.doctorSpecialty}>{item.specialty}</Text>

@@ -9,11 +9,12 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
-import { Divider, Icon } from "@ui-kitten/components";
+import { Avatar, Divider, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { parseISO, isToday, isBefore, isFuture } from "date-fns";
 import { toZonedTime, format } from "date-fns-tz";
 import axios from "../../api/axios";
+import DefaultAvatar from "./DefaultAvatar";
 
 interface User {
   _id: string;
@@ -28,6 +29,7 @@ interface Doctor {
   about: string;
   location: string;
   availability: Array<{ day: string; startTime: string }>;
+  avatar: string;
 }
 
 interface Appointment {
@@ -160,10 +162,17 @@ function AppointmentScreen() {
           </View>
           <Text style={styles.appointmentStatus}>{getAppointmentStatus()}</Text>
           <View style={styles.doctorInfo}>
-            <Image
-              source={require("../../assets/images/avatar4.jpg")}
-              style={styles.avatar}
-            />
+            {item.doctorId.avatar ? (
+              <Avatar
+                source={{ uri: item.doctorId.avatar }}
+                size="giant"
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={{ marginRight: 10 }}>
+                <DefaultAvatar name={item.doctorId._id.name} width={30} height={30}></DefaultAvatar>
+              </View>
+            )}
             <Text style={styles.doctorName}>Dr {item.doctorId._id.name}</Text>
           </View>
         </View>
@@ -318,6 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "black",
     opacity: 0.5,
+    textTransform:"capitalize"
   },
 });
 

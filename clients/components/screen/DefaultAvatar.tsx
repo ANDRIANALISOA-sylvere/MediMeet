@@ -1,11 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ViewStyle } from "react-native";
 
 interface DefaultAvatarProps {
   name: string;
+  width?: number;
+  height?: number;
 }
 
-function DefaultAvatar({ name }: DefaultAvatarProps) {
+function DefaultAvatar({ name, width, height }: DefaultAvatarProps) {
   const initial = name.split(" ")[0][0];
 
   const randomColor = () => {
@@ -30,8 +32,17 @@ function DefaultAvatar({ name }: DefaultAvatarProps) {
   const textColor = randomColor();
   const backgroundColor = lightenColor(textColor, 40);
 
+  // Calcul du style personnalisé pour le conteneur
+  const containerStyle: ViewStyle = {
+    ...styles.container,
+    backgroundColor,
+    width: width || styles.container.width,
+    height: height || styles.container.height,
+    borderRadius: (width || height || styles.container.width) / 2,
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor }]}>
+    <View style={containerStyle}>
       <Text style={[styles.initial, { color: textColor }]}>{initial}</Text>
     </View>
   );
