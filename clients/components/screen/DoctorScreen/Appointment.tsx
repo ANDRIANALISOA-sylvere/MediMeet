@@ -15,6 +15,7 @@ import { parseISO, isToday, isBefore, isFuture } from "date-fns";
 import { toZonedTime, format } from "date-fns-tz";
 import axios from "../../../api/axios";
 import { Button, Icon } from "@ui-kitten/components";
+import DefaultAvatar from "../DefaultAvatar";
 
 interface User {
   _id: string;
@@ -24,6 +25,7 @@ interface User {
 interface Patient {
   _id: User;
   name: string;
+  avatar: string;
 }
 
 interface Appointment {
@@ -195,10 +197,18 @@ function Appointment() {
       >
         <View style={styles.appointmentItem}>
           <View style={styles.leftColumn}>
-            <Image
-              source={require("../../../assets/images/avatar4.jpg")}
-              style={styles.avatar}
-            />
+            {item.patientId.avatar ? (
+              <Image
+                source={{ uri: item.patientId.avatar }}
+                style={styles.avatar}
+              />
+            ) : (
+              <DefaultAvatar
+                name={item.patientId.name}
+                width={60}
+                height={60}
+              />
+            )}
           </View>
           <View style={styles.rightColumn}>
             <View

@@ -1,4 +1,5 @@
 const Review = require("../models/Review.model");
+const Patient = require("../models/Patient.model");
 
 const addReview = async (req, res) => {
   const { doctorId, patientId, rating, comment } = req.body;
@@ -65,6 +66,16 @@ const getReviews = async (req, res) => {
       })
       .lean();
 
+    const patientIds = reviews.map((review) => review.patientId._id);
+    const patients = await Patient.find(
+      { _id: { $in: patientIds } },
+      "avatar"
+    ).lean();
+
+    const avatarMap = new Map(
+      patients.map((p) => [p._id.toString(), p.avatar])
+    );
+
     reviews = reviews.map((review) => {
       if (review.patientId) {
         return {
@@ -72,6 +83,7 @@ const getReviews = async (req, res) => {
           patientId: {
             _id: review.patientId._id,
             name: review.patientId.name,
+            avatar: avatarMap.get(review.patientId._id.toString()),
           },
         };
       }
@@ -88,6 +100,9 @@ const getReviews = async (req, res) => {
     });
   }
 };
+
+module.exports = { getReviews };
+
 const getReviewById = async (req, res) => {
   const { id } = req.params;
 
@@ -151,5 +166,5 @@ module.exports = {
   getReviews,
   updateReview,
   deleteReview,
-  getReviewById
+  getReviewById,
 };

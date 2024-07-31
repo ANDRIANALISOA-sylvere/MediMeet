@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { Icon } from "@ui-kitten/components";
+import DefaultAvatar from "./DefaultAvatar";
 
 interface Review {
   _id: string;
@@ -22,6 +23,7 @@ interface Review {
     address: string;
     createdAt: string;
     updatedAt: string;
+    avatar: string;
   };
   rating: number;
   comment: string;
@@ -37,10 +39,21 @@ const ReviewList: React.FC<ReviewListProps> = ({ review }) => (
   <View style={styles.reviewContainer}>
     <View style={styles.headerContainer}>
       <View style={styles.userInfo}>
-        <Image
-          source={require("../../assets/images/avatar4.jpg")}
-          style={styles.avatar}
-        />
+        {review.patientId.avatar ? (
+          <Image
+            source={{ uri: review.patientId.avatar }}
+            style={styles.avatar}
+          />
+        ) : (
+          <View style={{ marginRight: 10 }}>
+            <DefaultAvatar
+              name={review.patientId.name}
+              width={40}
+              height={40}
+            ></DefaultAvatar>
+          </View>
+        )}
+
         <Text style={styles.userName}>{review.patientId.name}</Text>
       </View>
       <View style={styles.ratingContainer}>
@@ -85,7 +98,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
     fontSize: 16,
     color: "#003366",
-    textTransform:"capitalize"
+    textTransform: "capitalize",
   },
   ratingContainer: {
     flexDirection: "row",

@@ -6,10 +6,12 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Icon, Button, Avatar } from "@ui-kitten/components";
 import axios from "../../api/axios";
 import DefaultAvatar from "./DefaultAvatar";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface Doctor {
   _id: string;
@@ -31,6 +33,28 @@ interface Doctor {
 
 function HomeScreen({ navigation }: any) {
   const [popularDoctors, setPopularDoctors] = useState<Doctor[]>([]);
+  const [userName, setUserName] = useState<string>("");
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchUserData = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+      if (userData) {
+        const user = JSON.parse(userData);
+        const response = await axios.get(`/patient/${user._id}`);
+        if (response.data && response.data.patient) {
+          setUserName(response.data.patient._id.name);
+          setUserAvatar(response.data.patient.avatar || null);
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Erreur lors de la récupération des données de l'utilisateur:",
+        error
+      );
+    }
+  };
 
   const fetchPopularDoctors = async () => {
     try {
@@ -45,6 +69,7 @@ function HomeScreen({ navigation }: any) {
   };
 
   useEffect(() => {
+    fetchUserData();
     fetchPopularDoctors();
   }, []);
 
@@ -56,17 +81,28 @@ function HomeScreen({ navigation }: any) {
     navigation.navigate("SearchDoctor");
   };
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    Promise.all([fetchUserData(), fetchPopularDoctors()])
+      .then(() => setRefreshing(false))
+      .catch((error) => {
+        console.error("Erreur lors du rafraîchissement:", error);
+        setRefreshing(false);
+      });
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={{ flexDirection: "row" }}>
-          <Image
-            source={require("../../assets/images/avatar4.jpg")}
-            style={styles.avatar}
-          />
+          {userAvatar ? (
+            <Image source={{ uri: userAvatar }} style={styles.avatar} />
+          ) : (
+            <DefaultAvatar name={userName} />
+          )}
           <View style={styles.textContainer}>
             <Text style={styles.greetingText}>Bonjour</Text>
-            <Text style={styles.nameText}>Mr Joséphin</Text>
+            <Text style={styles.nameText}>{userName}</Text>
           </View>
         </View>
         <View style={{ flexDirection: "row", gap: 10 }}>
@@ -114,7 +150,12 @@ function HomeScreen({ navigation }: any) {
         </View>
       </View>
 
-      <ScrollView style={styles.doctorList}>
+      <ScrollView
+        style={styles.doctorList}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         {popularDoctors.map((doctor: Doctor) => (
           <View key={doctor._id} style={styles.doctorContainer}>
             <TouchableOpacity

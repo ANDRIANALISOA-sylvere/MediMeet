@@ -20,6 +20,11 @@ interface Patient {
   avatar: string | null;
 }
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0];
+};
+
 const ProfilePatient: React.FC = () => {
   const [patient, setPatient] = useState<Patient>({
     dateOfBirth: "",
@@ -56,7 +61,7 @@ const ProfilePatient: React.FC = () => {
       if (response.data && response.data.patient) {
         const { dateOfBirth, gender, address, avatar } = response.data.patient;
         setPatient({
-          dateOfBirth,
+          dateOfBirth: formatDate(dateOfBirth),
           gender,
           address,
           avatar,
