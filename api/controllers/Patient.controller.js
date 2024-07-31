@@ -2,6 +2,13 @@ const Patient = require("../models/Patient.model");
 
 const addPatient = async (req, res) => {
   const { _id, dateOfBirth, gender, address } = req.body;
+  let avatar = "";
+
+  if (req.file) {
+    avatar = `http://192.168.43.149:8800/${req.file.path}`;
+  }
+
+  console.log(_id, dateOfBirth, gender, address, avatar);
 
   try {
     const patient = new Patient({
@@ -9,6 +16,7 @@ const addPatient = async (req, res) => {
       dateOfBirth,
       gender,
       address,
+      avatar,
     });
 
     await patient.save();
@@ -18,16 +26,16 @@ const addPatient = async (req, res) => {
       "name email role phone"
     );
 
-    res.status(201).json({ patient : populatedPatient });
+    res.status(201).json({ patient: populatedPatient });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error adding patient");
+    res.status(500).json({ error: "Error adding patient" });
   }
 };
 
 const getPatients = async (req, res) => {
   try {
-    const patients = await Patient.find().populate('_id');
+    const patients = await Patient.find().populate("_id");
 
     res.status(200).json({ patients });
   } catch (error) {
@@ -40,7 +48,7 @@ const getPatientById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const patient = await Patient.findById(id).populate('_id');
+    const patient = await Patient.findById(id).populate("_id");
 
     if (!patient) {
       return res.status(404).json("Patient not found");
@@ -91,7 +99,6 @@ const deletePatient = async (req, res) => {
     res.status(500).json("Error deleting patient");
   }
 };
-
 
 module.exports = {
   addPatient,

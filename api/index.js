@@ -44,6 +44,7 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use("/uploads", express.static("uploads"));
 
 require("./config/passport");
 
@@ -88,7 +89,7 @@ app.use("/api", ReviewRouter);
 app.use("/api", MedicalRecord);
 app.use("/api", MessageRouter);
 app.use("/api", MapRouter);
-app.use("/api",TwilioRouter)
+app.use("/api", TwilioRouter);
 
 server.listen(PORT, () => {
   console.log(`server run on the PORT ${PORT}`);

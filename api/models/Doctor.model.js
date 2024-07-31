@@ -18,6 +18,7 @@ const doctorSchema = new Schema(
     about: { type: String, required: true },
     location: { type: String, required: true },
     availability: [availabilitySchema],
+    avatar: { type: String },
   },
   {
     timestamps: true,

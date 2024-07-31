@@ -4,8 +4,13 @@ const mongoose = require("mongoose");
 
 const addDoctor = async (req, res) => {
   const { _id, specialty, experience, price, about, location } = req.body;
+  let avatar = "";
 
-  console.log(req.body);
+  if (req.file) {
+    avatar = `http://192.168.43.149:8800/${req.file.path}`;
+  }
+
+  console.log(_id, specialty, experience, price, about, location, avatar);
 
   try {
     let doctor = await Doctor.findById(_id);
@@ -16,6 +21,9 @@ const addDoctor = async (req, res) => {
       doctor.price = price;
       doctor.about = about;
       doctor.location = location;
+      if (avatar) {
+        doctor.avatar = avatar;
+      }
 
       await doctor.save();
     } else {
@@ -26,6 +34,7 @@ const addDoctor = async (req, res) => {
         price,
         about,
         location,
+        avatar,
       });
 
       await doctor.save();
@@ -39,7 +48,7 @@ const addDoctor = async (req, res) => {
     res.status(200).json({ doctor: populatedDoctor });
   } catch (error) {
     console.error(error);
-    res.status(500).json("Error adding or updating doctor");
+    res.status(500).json({ error: "Error adding or updating doctor" });
   }
 };
 

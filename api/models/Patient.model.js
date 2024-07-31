@@ -7,6 +7,7 @@ const patientSchema = new Schema(
     dateOfBirth: { type: Date, required: true },
     gender: { type: String, required: true },
     address: { type: String, required: true },
+    avatar: { type: String },
   },
   {
     timestamps: true,
