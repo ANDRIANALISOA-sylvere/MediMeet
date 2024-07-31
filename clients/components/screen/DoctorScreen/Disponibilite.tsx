@@ -1,16 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, FlatList, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../..//api/axios";
-import { Button, Input } from "@ui-kitten/components";
+import { Button, Datepicker, Input, Layout } from "@ui-kitten/components";
 import Toast from "react-native-toast-message";
 
 interface Availability {
@@ -23,8 +15,8 @@ const Disponibilite = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newDay, setNewDay] = useState("");
-  const [newStartTime, setNewStartTime] = useState("");
+  const [newDate, setNewDate] = useState(new Date());
+  const [newTime, setNewTime] = useState("");
 
   useEffect(() => {
     fetchAvailabilities();
@@ -66,8 +58,15 @@ const Disponibilite = () => {
   };
 
   const addAvailability = async () => {
-    if (!newDay || !newStartTime) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+    if (!newDate || !newTime) {
+      Alert.alert("Erreur", "Veuillez sélectionner une date et une heure");
+      return;
+    }
+
+    // Validation simple du format de l'heure
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(newTime)) {
+      Alert.alert("Erreur", "Veuillez entrer l'heure au format HH:MM");
       return;
     }
 
@@ -81,9 +80,13 @@ const Disponibilite = () => {
       const user = JSON.parse(userString);
       const doctorId = user._id;
 
+      const formattedDate = `${newDate.getFullYear()}/${String(
+        newDate.getMonth() + 1
+      ).padStart(2, "0")}/${String(newDate.getDate()).padStart(2, "0")}`;
+
       const newAvailability = {
-        day: newDay,
-        startTime: newStartTime,
+        day: formattedDate,
+        startTime: newTime,
       };
 
       const response = await axios.post(
@@ -92,13 +95,13 @@ const Disponibilite = () => {
       );
 
       setAvailabilities([...availabilities, newAvailability]);
-      setNewDay("");
-      setNewStartTime("");
+      setNewDate(new Date());
+      setNewTime("");
       setShowAddForm(false);
       showToast("success", "Succès", "Nouvelle disponibilité ajoutée" + " 💯");
     } catch (err) {
       console.error("Erreur lors de l'ajout de la disponibilité:", err);
-      Alert.alert("Erreur', 'Une erreur est survenue lors de l'ajout");
+      Alert.alert("Erreur", "Une erreur est survenue lors de l'ajout");
     }
   };
 
@@ -143,23 +146,23 @@ const Disponibilite = () => {
             Ajouter une disponibilité
           </Button>
         ) : (
-          <View style={styles.formContainer}>
-            <Input
+          <Layout style={styles.formContainer}>
+            <Datepicker
+              date={newDate}
+              onSelect={(nextDate) => setNewDate(nextDate)}
               style={styles.input}
-              placeholder="Date (YYYY/MM/DD)"
-              value={newDay}
-              onChangeText={setNewDay}
+              placeholder="Sélectionnez une date"
             />
             <Input
               style={styles.input}
               placeholder="Heure de début (HH:MM)"
-              value={newStartTime}
-              onChangeText={setNewStartTime}
+              value={newTime}
+              onChangeText={setNewTime}
             />
             <Button style={styles.submitButton} onPress={addAvailability}>
               Ajouter
             </Button>
-          </View>
+          </Layout>
         )}
       </View>
       <Toast />
