@@ -10,6 +10,7 @@ import {
 import { Text, List, Spinner, Icon } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
+import DefaultAvatar from "../DefaultAvatar";
 
 interface User {
   _id: string;
@@ -24,6 +25,7 @@ interface Patient {
   dateOfBirth: string;
   gender: string;
   address: string;
+  avatar: string;
 }
 
 const Patient: React.FC = () => {
@@ -76,10 +78,13 @@ const Patient: React.FC = () => {
           onPress={() => toggleExpand(item._id._id)}
           style={styles.headerContainer}
         >
-          <Image
-            source={require("../../../assets/images/avatar4.jpg")}
-            style={styles.avatar}
-          />
+          {item.avatar ? (
+            <Image source={{ uri: item.avatar }} style={styles.avatar} />
+          ) : (
+            <View style={{ marginRight: 10 }}>
+              <DefaultAvatar name={item._id.name} width={50} height={50} />
+            </View>
+          )}
           <Text style={styles.nameText}>{item._id.name}</Text>
           <Icon
             name={isExpanded ? "arrow-up" : "arrow-down"}

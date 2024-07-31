@@ -12,6 +12,7 @@ import { Input, Icon } from "@ui-kitten/components";
 import io, { Socket } from "socket.io-client";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DefaultAvatar from "../DefaultAvatar";
 
 const SOCKET_URL = "http://192.168.43.149:8800";
 
@@ -24,6 +25,7 @@ interface Patient {
   dateOfBirth: string;
   gender: string;
   address: string;
+  avatar: string;
 }
 
 interface User {
@@ -97,10 +99,13 @@ function Message({ navigation }: any) {
   const renderPatientItem = ({ item }: { item: Patient }) => (
     <TouchableOpacity onPress={() => handlePatientPress(item)}>
       <View style={styles.patientItem}>
-        <Image
-          source={require("../../../assets/images/avatar4.jpg")}
-          style={styles.avatar}
-        />
+        {item.avatar ? (
+          <Image source={{ uri: item.avatar }} style={styles.avatar} />
+        ) : (
+          <View style={{marginRight:10}}>
+            <DefaultAvatar name={item._id.name} width={50} height={50} />
+          </View>
+        )}
         <View style={styles.patientInfo}>
           <Text style={styles.patientName}>{item._id.name}</Text>
           <Text style={styles.patientDetails}>

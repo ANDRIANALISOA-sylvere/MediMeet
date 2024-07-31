@@ -265,6 +265,7 @@ const GetDoctorPatients = async (req, res) => {
         model: "User",
         select: "name email",
       },
+      select:"avatar gender address dateOfBirth"
     });
 
     if (appointments.length === 0) {
