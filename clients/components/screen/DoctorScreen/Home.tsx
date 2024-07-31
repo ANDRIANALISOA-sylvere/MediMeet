@@ -4,14 +4,13 @@ import {
   StyleSheet,
   ScrollView,
   RefreshControl,
-  Dimensions,
   Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
-import { Layout, Card, Text, Icon } from "@ui-kitten/components";
+import { Layout, Card, Text, Icon, Avatar } from "@ui-kitten/components";
 import AppointmentStats from "./AppointmentStats";
-import { LineChart } from "react-native-chart-kit";
+import DefaultAvatar from "../DefaultAvatar";
 
 const PersonIcon = (props: any) => <Icon {...props} name="person-outline" />;
 const StarIcon = (props: any) => <Icon {...props} name="star-outline" />;
@@ -23,6 +22,7 @@ function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [patientData, setPatientData] = useState([0, 0, 0]);
   const [doctorName, setDoctorName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const fetchDoctorData = async () => {
     try {
@@ -33,7 +33,6 @@ function Home() {
 
       const user = JSON.parse(userString);
       const doctorId = user._id;
-      setDoctorName(user.name);
 
       const patientResponse = await axios.get(
         `/doctor/patients?doctorId=${doctorId}`
@@ -60,9 +59,12 @@ function Home() {
       setPatientData(patientCounts);
 
       const doctorResponse = await axios.get(`/doctor/${doctorId}`);
-      const { averageRating, reviewCount } = doctorResponse.data.data;
+      const { averageRating, reviewCount, avatar, name } =
+        doctorResponse.data.data;
       setAverageRating(averageRating || 0);
       setReviewCount(reviewCount || 0);
+      setAvatarUrl(avatar);
+      setDoctorName(name);
     } catch (error) {
       console.error("Failed to fetch doctor data:", error);
     }
@@ -86,10 +88,15 @@ function Home() {
     >
       <View style={styles.header}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Image
-            source={require("../../../assets/images/avatar4.jpg")}
-            style={styles.avatar}
-          />
+          {avatarUrl ? (
+            <Avatar
+              source={{ uri: avatarUrl }}
+              size="giant"
+              style={styles.avatar}
+            />
+          ) : (
+            <DefaultAvatar name={doctorName}></DefaultAvatar>
+          )}
           <View style={styles.textContainer}>
             <Text style={styles.greetingText}>Bonjour</Text>
             <Text style={styles.nameText}>Dr. {doctorName}</Text>

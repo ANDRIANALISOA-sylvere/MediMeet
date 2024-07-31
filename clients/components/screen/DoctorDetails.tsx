@@ -9,7 +9,7 @@ import {
   Alert,
   TextInput,
 } from "react-native";
-import { Icon, Button } from "@ui-kitten/components";
+import { Icon, Button, Avatar } from "@ui-kitten/components";
 import {
   format,
   parse,
@@ -21,6 +21,7 @@ import axios from "../../api/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ReviewList from "./ReviewList";
 import Toast from "react-native-toast-message";
+import DefaultAvatar from "./DefaultAvatar";
 
 const CommentInput = ({ value, onChangeText }: any) => {
   const [localComment, setLocalComment] = useState(value);
@@ -236,10 +237,15 @@ function DoctorDetails({ route }: any) {
   const renderHeader = () => (
     <>
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/avatar4.jpg")}
-          style={styles.avatar}
-        />
+        {doctor.avatar ? (
+          <Avatar
+            source={{ uri: doctor.avatar }}
+            size="giant"
+            style={styles.avatar}
+          />
+        ) : (
+          <DefaultAvatar name={doctor.name}></DefaultAvatar>
+        )}
         <View style={styles.headerText}>
           <Text style={styles.name}>Dr {doctor.name}</Text>
           <Text style={styles.specialty}>{doctor.specialty}</Text>

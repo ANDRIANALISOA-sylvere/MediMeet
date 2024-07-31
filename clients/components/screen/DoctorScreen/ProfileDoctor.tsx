@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Text, Input, Button, Spinner } from "@ui-kitten/components";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "../../../api/axios";
 import Toast from "react-native-toast-message";
+import * as ImagePicker from "expo-image-picker";
+import { Icon } from "@ui-kitten/components";
 
 interface Doctor {
   about: string;
@@ -11,6 +19,7 @@ interface Doctor {
   location: string;
   price: string;
   specialty: string;
+  avatar: string | null;
 }
 
 const ProfileDoctor: React.FC = () => {
@@ -20,6 +29,7 @@ const ProfileDoctor: React.FC = () => {
     location: "",
     price: "",
     specialty: "",
+    avatar: null,
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -48,7 +58,7 @@ const ProfileDoctor: React.FC = () => {
     try {
       const response = await axios.get(`/doctor/${id}`);
       if (response.data && response.data.data) {
-        const { about, experience, location, price, specialty } =
+        const { about, experience, location, price, specialty, avatar } =
           response.data.data;
         setDoctor({
           about,
@@ -56,6 +66,7 @@ const ProfileDoctor: React.FC = () => {
           location,
           price: price.toString(),
           specialty,
+          avatar,
         });
       }
     } catch (error) {
@@ -79,6 +90,19 @@ const ProfileDoctor: React.FC = () => {
     });
   };
 
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setDoctor({ ...doctor, avatar: result.assets[0].uri });
+    }
+  };
+
   const handleSubmit = async () => {
     if (!userId) {
       console.error("ID utilisateur non disponible");
@@ -87,9 +111,28 @@ const ProfileDoctor: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("/doctor", {
-        ...doctor,
-        _id: userId,
+      const formData = new FormData();
+      formData.append("_id", userId);
+      formData.append("about", doctor.about);
+      formData.append("experience", doctor.experience);
+      formData.append("location", doctor.location);
+      formData.append("price", doctor.price);
+      formData.append("specialty", doctor.specialty);
+
+      if (doctor.avatar) {
+        const uriParts = doctor.avatar.split(".");
+        const fileType = uriParts[uriParts.length - 1];
+        formData.append("avatar", {
+          uri: doctor.avatar,
+          name: `avatar.${fileType}`,
+          type: `image/${fileType}`,
+        } as any);
+      }
+
+      const response = await axios.post("/doctor", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
       showToast("success", "Succès", "Profil mis à jour avec succès 💯");
       console.log("Profil mis à jour avec succès:", response.data);
@@ -114,6 +157,17 @@ const ProfileDoctor: React.FC = () => {
       <ScrollView style={styles.container}>
         <View style={styles.layout}>
           <Text style={styles.title}>Éditer votre profil</Text>
+
+          <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+            {doctor.avatar ? (
+              <Image source={{ uri: doctor.avatar }} style={styles.avatar} />
+            ) : (
+              <>
+                <Icon name="camera" width={40} height={40} fill="#888" />
+                <Text style={styles.avatarText}>Ajouter un avatar</Text>
+              </>
+            )}
+          </TouchableOpacity>
 
           <Input
             label="Spécialité"
@@ -155,11 +209,7 @@ const ProfileDoctor: React.FC = () => {
             style={styles.input}
           />
 
-          <Button
-            onPress={handleSubmit}
-            status="success"
-            disabled={loading}
-          >
+          <Button onPress={handleSubmit} status="success" disabled={loading}>
             {loading ? <Spinner size="small" /> : "Mettre à jour le profil"}
           </Button>
         </View>
@@ -172,7 +222,7 @@ const ProfileDoctor: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:"#fff"
+    backgroundColor: "#fff",
   },
   layout: {
     flex: 1,
@@ -188,6 +238,25 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 20,
+  },
+  avatarContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "#f0f0f0",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    marginBottom: 20,
+    overflow: "hidden",
+  },
+  avatar: {
+    width: "100%",
+    height: "100%",
+  },
+  avatarText: {
+    marginTop: 10,
+    color: "#888",
   },
 });
 

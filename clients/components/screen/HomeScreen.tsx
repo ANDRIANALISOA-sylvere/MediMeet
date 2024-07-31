@@ -7,8 +7,9 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Icon, Button } from "@ui-kitten/components";
+import { Icon, Button, Avatar } from "@ui-kitten/components";
 import axios from "../../api/axios";
+import DefaultAvatar from "./DefaultAvatar";
 
 interface Doctor {
   _id: string;
@@ -18,6 +19,7 @@ interface Doctor {
   price: number;
   about: string;
   location: string;
+  avatar: string;
   availability: {
     day: string;
     startTime: string;
@@ -119,10 +121,16 @@ function HomeScreen({ navigation }: any) {
               style={{ flexDirection: "row", alignItems: "center" }}
               onPress={() => handleDoctorPress(doctor)}
             >
-              <Image
-                source={require("../../assets/images/docteur.webp")}
-                style={styles.doctorAvatar}
-              />
+              {doctor.avatar ? (
+                <Avatar
+                  source={{ uri: doctor.avatar }}
+                  size="giant"
+                  style={styles.doctorAvatar}
+                />
+              ) : (
+                <DefaultAvatar name={doctor.name}></DefaultAvatar>
+              )}
+
               <View style={styles.doctorTextContainer}>
                 <Text style={styles.doctorName}>Dr. {doctor.name}</Text>
                 <Text style={styles.doctorSpecialty}>{doctor.specialty}</Text>
